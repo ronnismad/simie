@@ -90,7 +90,7 @@ async function evaluate(){
   if(!ready)return;const ticket=++latestEvaluation;clearTimeout(timer);error('');
   if(!$('#design-form').reportValidity())return;
   $('#evaluate').disabled=true;$('#export-result').disabled=true;$('#forward-results').setAttribute('aria-busy','true');
-  try{const result=await request('evaluate',readDesign());if(ticket!==latestEvaluation)return;if(Number($('#network-member').value)!==0)result.trace=await request('trace',{design:result.evaluation.design,member:Number($('#network-member').value)});if(ticket!==latestEvaluation)return;current=result;renderForward();$('#export-result').disabled=false;}
+  try{const result=await request('evaluate',readDesign());if(ticket!==latestEvaluation)return;let member=result.trace?.member-1;while(metadata.networks_available&&member!==Number($('#network-member').value)){member=Number($('#network-member').value);result.trace=await request('trace',{design:result.evaluation.design,member});if(ticket!==latestEvaluation)return;}current=result;renderForward();$('#export-result').disabled=false;}
   catch(e){if(ticket===latestEvaluation)error(e.message);}
   finally{if(ticket===latestEvaluation){$('#evaluate').disabled=false;$('#forward-results').setAttribute('aria-busy','false');}}
 }
@@ -114,7 +114,7 @@ $('#language').value=language();$('#language').addEventListener('change',()=>{se
 function themeState(){const dark=document.documentElement.dataset.theme==='dark';$('#theme-toggle').setAttribute('aria-pressed',String(dark));$('#theme-toggle span').textContent=dark?'Light mode':'Dark mode';localise();}
 themeState();$('#theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('simie-theme',document.documentElement.dataset.theme);}catch{}themeState();});
 $('#live-update').addEventListener('change',()=>{clearTimeout(timer);$('#estimate-mode-label').textContent=$('#live-update').checked?'Inputs update the estimate':'Estimate on click';localise();if($('#live-update').checked)evaluate();});
-$('#network-member').addEventListener('change',async()=>{if(!current)return;try{const trace=await request('trace',{design:current.evaluation.design,member:Number($('#network-member').value)});if(trace){current.trace=trace;$('#network-diagram').innerHTML=networkDiagram(trace,current.evaluation.design);localise();}}catch(e){error(e.message);}});
+$('#network-member').addEventListener('change',async()=>{if(!current)return;const design=current.evaluation.design.slice(),key=JSON.stringify(design),member=Number($('#network-member').value);try{const trace=await request('trace',{design,member});if(trace&&JSON.stringify(current.evaluation.design)===key&&Number($('#network-member').value)===member){current.trace=trace;if(lastExport)lastExport.trace=trace;$('#network-diagram').innerHTML=networkDiagram(trace,design);localise();}}catch(e){error(e.message);}});
 $('#design-form').addEventListener('submit',e=>{e.preventDefault();evaluate();});
 $('#reset').addEventListener('click',()=>{if(!ready)return;setDesign(metadata.optics.reference);$('#preset').value='reference';evaluate();});
 $('#preset').addEventListener('change',()=>{if(!ready||$('#preset').value==='custom')return;setDesign($('#preset').value==='reference'?metadata.optics.reference:metadata.calibration.designs[Number($('#preset').value)]);evaluate();});
