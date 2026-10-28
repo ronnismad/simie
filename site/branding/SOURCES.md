@@ -21,3 +21,7 @@ https://dwxcb.hrbeu.edu.cn/xxwhbsywhcp/main.psp
 Source image: https://dwxcb.hrbeu.edu.cn/_upload/article/images/33/2e/5c91d223442590b9e8f154801cb6/47cecd6e-44ec-41fd-85cc-684139fa0a1c.jpg
 
 Displayed as an author affiliation alongside ITMO. University marks retain their respective ownership.
+
+Transparent PNG rendition: https://www.urongda.com/logos/4123010217
+Asset: https://cdn.urongda.com/images/normal/medium/harbin-engineering-university-logo-1024px.png
+Checked visually against the official university emblem linked above; used without modification.
