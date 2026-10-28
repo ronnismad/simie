@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.bin -text
+site/assets/*.json -text
+verification/*.json -text
+model/data/** -text

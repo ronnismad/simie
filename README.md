@@ -1,4 +1,6 @@
-# PNFA · Nanoparticle design lab
+# SiMie
+
+**Mie-resonant silicon nanoparticle design for perovskite solar cells.**
 
 A fresh, auditable implementation of the equations and methods in
 `main_PNFA_V2.5.tex` and `SupplPNFA.pdf`. It computes the direct physical model
@@ -6,7 +8,7 @@ in the browser and provides a newly trained forward/inverse ensemble.
 No earlier implementation, saved predictions, neural weights or Mie lookup
 table is loaded. The manuscript and all legacy folders are preserved.
 
-**App:** https://ronnismad.github.io/pnfa-paper-model/
+**App:** https://ronnismad.github.io/simie/
 
 ## Scientific scope
 
@@ -66,7 +68,7 @@ Python 3.13, Node.js 22 or later:
 
 ```text
 python -m pip install -r requirements.txt
-python -B model/build.py
+python -B model/build.py --verify-only
 python -B -m unittest discover -s tests -v
 python -B model/verify.py
 node tests/check_browser.mjs
@@ -77,6 +79,11 @@ Open http://localhost:8765. Use an HTTP server; browsers cannot load module
 workers or scientific assets correctly from a file:// URL. All deployed paths
 are relative, including worker assets, so repository-subpath hosting works.
 There are no runtime CDN, font, analytics, API or backend dependencies.
+
+The interface supports English and Russian, light and dark themes, live updates
+or explicit **Estimate**, and a dynamic network diagram displaying actual
+activations of all 64 neurons per hidden layer for a selectable ensemble member.
+Language and theme preferences persist locally; they do not change calculations.
 
 To reproduce training from zero weights (does not consume old weights):
 

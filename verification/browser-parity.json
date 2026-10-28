@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "n_designs": 116,
+  "direct_response_max_abs_error": 1.3322676295501878e-15,
+  "direct_basis_max_abs_error": 8.881784197001252e-15,
+  "neural": {
+    "prediction_max_abs_error": 8.881784197001252e-16,
+    "inverse_max_abs_error": 2.2737367544323206e-13,
+    "selection_recomputed": true
+  },
+  "energy_violation_flagged": true
+}

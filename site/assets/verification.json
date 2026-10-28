@@ -1,0 +1,224 @@
+{
+  "implementation": "SiMie 1.0",
+  "source": "Fresh implementation from main_PNFA_V2.5 and SupplPNFA; original data only",
+  "manuscript_sha256": "ba9531ffb6abe313c168081aefc3eae4df10197fd4d44526e1129f740feb6f97",
+  "training": {
+    "designs": 12000,
+    "members": 5,
+    "forward_steps": 4000,
+    "inverse_steps": 4000,
+    "sampling_seed": 4101,
+    "network_seed": 4201,
+    "bootstrap_seed": 1703
+  },
+  "browser_parity": {
+    "passed": true,
+    "n_designs": 116,
+    "direct_response_max_abs_error": 1.3322676295501878e-15,
+    "direct_basis_max_abs_error": 8.881784197001252e-15,
+    "neural": {
+      "prediction_max_abs_error": 8.881784197001252e-16,
+      "inverse_max_abs_error": 2.2737367544323206e-13,
+      "selection_recomputed": true
+    },
+    "energy_violation_flagged": true
+  },
+  "forward_holdout": [
+    {
+      "r2": [
+        0.9362147539509502,
+        0.9417876393181304,
+        null
+      ],
+      "mae": [
+        0.050224084354027365,
+        0.01630494308327704,
+        0.002661483461444349
+      ]
+    },
+    {
+      "r2": [
+        0.9368809491428844,
+        0.9414717268387537,
+        null
+      ],
+      "mae": [
+        0.049092781319473026,
+        0.0162814390924353,
+        0.002713717694057212
+      ]
+    },
+    {
+      "r2": [
+        0.9349034765544108,
+        0.9347990828068288,
+        null
+      ],
+      "mae": [
+        0.039566295676843215,
+        0.010169372892100497,
+        0.004016715382220911
+      ]
+    },
+    {
+      "r2": [
+        0.936197279098719,
+        0.9417685070260968,
+        null
+      ],
+      "mae": [
+        0.05022315216287501,
+        0.01629927962380159,
+        0.0026738526118275513
+      ]
+    },
+    {
+      "r2": [
+        0.9377873855300415,
+        0.942700191855742,
+        null
+      ],
+      "mae": [
+        0.048795791891884946,
+        0.016113107392272084,
+        0.002489265048616621
+      ]
+    }
+  ],
+  "inverse_direct_checks": [
+    {
+      "design": [
+        171.8621611892866,
+        0.23304702573885872,
+        1226.935041748897,
+        0.6209023312852475,
+        1.53,
+        880.0,
+        60.0,
+        0.0,
+        1.0
+      ],
+      "recalculated": [
+        0.11123901870463533,
+        0.029876191108164286,
+        -0.0
+      ],
+      "error": [
+        -0.008760981295364664,
+        0.009876191108164286,
+        -0.0
+      ]
+    },
+    {
+      "design": [
+        172.1939812079939,
+        0.2418803961791959,
+        1162.02013516466,
+        0.46324144860104594,
+        1.53,
+        880.0,
+        60.0,
+        0.0,
+        1.0
+      ],
+      "recalculated": [
+        0.12367983332003411,
+        0.030966598253323246,
+        -0.0
+      ],
+      "error": [
+        0.0036798333200341177,
+        0.010966598253323245,
+        -0.0
+      ]
+    },
+    {
+      "design": [
+        128.07333586546503,
+        0.192221767905636,
+        824.7910452045018,
+        0.23732702755551108,
+        1.53,
+        880.0,
+        60.0,
+        0.0,
+        1.0
+      ],
+      "recalculated": [
+        0.1065610210473015,
+        0.027347518675856143,
+        -0.0
+      ],
+      "error": [
+        -0.013438978952698494,
+        0.007347518675856143,
+        -0.0
+      ]
+    },
+    {
+      "design": [
+        170.73444937325888,
+        0.23449420944962238,
+        1241.0713018583222,
+        0.6579117582649348,
+        1.53,
+        880.0,
+        60.0,
+        0.0,
+        1.0
+      ],
+      "recalculated": [
+        0.1074601385040175,
+        0.029329645567792703,
+        -0.0
+      ],
+      "error": [
+        -0.01253986149598249,
+        0.009329645567792703,
+        -0.0
+      ]
+    },
+    {
+      "design": [
+        172.08241372044773,
+        0.24431086087965845,
+        1098.8046297049714,
+        0.5212640670916691,
+        1.53,
+        880.0,
+        60.0,
+        0.0,
+        1.0
+      ],
+      "recalculated": [
+        0.13794652688319395,
+        0.035438130927228625,
+        -0.0
+      ],
+      "error": [
+        0.017946526883193953,
+        0.015438130927228625,
+        -0.0
+      ]
+    }
+  ],
+  "scope": "Software consistency checks only; no independent experimental validation. Photon-budget and S2-grid limits are diagnostics and do not change the equations.",
+  "implementation_files_sha256": {
+    "model/build.py": "57303d42dee5e4c5fe642c3aa12963b5d23d45407908b8edbbd0c0dfcadcdcc9",
+    "model/calibration.py": "36b805ee4349c39e3c763aa46cad2403956d89cb9816000526ce2d5ebb3a0da3",
+    "model/network.py": "e1afa5011c8f86e9f116623a9ef4c128a5369c4381a453472db88d7a0ff05ac7",
+    "model/physics.py": "b3bb118028a9c0033e81ed5e52616aad4564b81c6a7a2a354a152fc49675deb6",
+    "model/release.py": "e3f127d57d40fb070009ebfee77fef4327880184d54546cbf2a0f668405054dd",
+    "model/train.py": "c44331735e8afa9bab94bb4e79e5a8aa05298c0ab5c05d5b3c9645d290ba5816",
+    "model/verify.py": "bd7b94e924b9e1b28a3f29589c24cb58f047dd721d5a373ecc9c5657c004e246",
+    "site/app.mjs": "14371d3d1120774c70f114cfc76382734e8f99ac6182e56baf658355c5509924",
+    "site/diagram.mjs": "f1e11898612b7a5b8c7780d9275c03fe0dd0c4855f40f14211c73f228ba6086a",
+    "site/i18n.mjs": "a8688490f728733d708e3e5e63d21bccb90a886de2058b37e14a5a5a349c3d86",
+    "site/index.html": "09e1bb133e44bfb1f071685adf2e870864d9118f61b072904185609b97dd40eb",
+    "site/networks.mjs": "1b507f6b71cabc73824f5055fbebfbe6ddac7092d13e0eeb3ece0b120ff3d9ca",
+    "site/physics.mjs": "7b568faad03b841b8e4caede4ae565c065e1e93043d280c4533ac408304b8f47",
+    "site/style.css": "62a3c57b16bdeca6e989eca3061cba9c876f1630a01152751455207a294fb1dc",
+    "site/theme.css": "68531d937070a84effed545dbc850e070d32d4d1ef6e745663e4bc85d356b563",
+    "site/worker.mjs": "11ce21852c64bba40d8faf7fbef787b109760ee2dec18106178804b20372e7ca"
+  }
+}

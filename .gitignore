@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+model/cache/
+verification/cases.json
+verification/*screenshot*.png
+*.zip
+.venv/
