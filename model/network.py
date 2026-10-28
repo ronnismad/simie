@@ -9,10 +9,10 @@ class Standard:
     def json(self): return {'mean':self.mean.tolist(),'scale':self.scale.tolist()}
 
 def encode(x):
-    a=x.copy();a[:,[2,6]]=np.log(a[:,[2,6]]);return a
+    a=x[:,[0,1,2,3,4,5,6,8]].copy();a[:,[2,6]]=np.log(a[:,[2,6]]);return a
 
 def context(x):
-    a=x[:,4:].copy();a[:,2]=np.log(a[:,2]);return a
+    a=x[:,[4,5,6,8]].copy();a[:,2]=np.log(a[:,2]);return a
 
 class Network:
     def __init__(self,sizes,rng,sigmoid=False):

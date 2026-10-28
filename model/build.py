@@ -25,7 +25,7 @@ def build(verify_only=False):
     np.save(ROOT/'cache/kernel.npy',physics.kernel)
     calibration=calibrate(physics)
     (target/'calibration.json').write_text(json.dumps(calibration,separators=(',',':')))
-    data=dict(wavelength=WAVELENGTH.tolist(),diameter=DIAMETER.tolist(),pvk=PVK.tolist(),photon_flux=photon_flux().tolist(),reference=REFERENCE.tolist(),bounds=BOUNDS.tolist(),features=FEATURES,normalisation=dict(S=physics.sref,G=physics.gref,Pi=physics.piref),grid='S2: 320–900 nm / 2 nm; 50–300 nm / 2 nm; trapezoid lognormal average without tail renormalisation',manuscript_sha256='ba9531ffb6abe313c168081aefc3eae4df10197fd4d44526e1129f740feb6f97')
+    data=dict(wavelength=WAVELENGTH.tolist(),diameter=DIAMETER.tolist(),pvk=PVK.tolist(),photon_flux=photon_flux().tolist(),reference=REFERENCE.tolist(),bounds=BOUNDS.tolist(),features=FEATURES,normalisation=dict(S=physics.sref,G=physics.gref,Pi=physics.piref),grid='S2: 320–900 nm / 2 nm; 50–300 nm / 2 nm; trapezoid lognormal average without tail renormalisation',manuscript_sha256='f6c690ef989c695a654b8645d0f5c95e15dc9925dbc90858e16d386392d67759')
     (target/'optics.json').write_text(json.dumps(data,separators=(',',':')))
     manifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'data').iterdir()}
     manifest['mie-kernel.bin']=hashlib.sha256((target/'mie-kernel.bin').read_bytes()).hexdigest()

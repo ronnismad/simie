@@ -14,7 +14,7 @@ def train_one(index,x,y,theta):
     order=rng.permutation(len(x));tr=order[:9600];te=order[9600:]
     xs=Standard(encode(x[tr]));ys=Standard(y[tr]);cs=Standard(context(x[tr]))
     xx=xs.enc(encode(x[tr]));yy=ys.enc(y[tr]);n=len(tr)
-    forward=Network([9,64,64,64,3],rng)
+    forward=Network([8,64,64,64,3],rng)
     started=time.time()
     for step in range(1,4001):
         difference=forward.forward(xx)-yy
@@ -23,7 +23,7 @@ def train_one(index,x,y,theta):
     pred=ys.dec(forward.forward(xs.enc(encode(x[te]))))
     variance=np.sum((y[te]-y[te].mean(0))**2,axis=0)
     r2=[float(1-np.sum((pred[:,j]-y[te,j])**2)/variance[j]) if variance[j]>1e-20 else None for j in range(3)]
-    inverse=Network([8,64,64,4],rng,sigmoid=True)
+    inverse=Network([7,64,64,4],rng,sigmoid=True)
     inputs=np.column_stack([yy,cs.enc(context(x[tr]))]);lo,hi=BOUNDS[:4].T;span=hi-lo
     for step in range(1,4001):
         unit=inverse.forward(inputs);free=lo+span*unit
@@ -47,7 +47,7 @@ def main():
     np.savez_compressed(ROOT/'cache/training-population.npz',designs=x,basis=basis)
     with ThreadPoolExecutor(max_workers=a.workers) as pool:
         members=list(pool.map(lambda i:train_one(i,x,labels[i],cal['member_coefficients'][i]),range(5)))
-    payload=dict(schema='pnfa-paper-v1',features=FEATURES,bounds=BOUNDS.tolist(),members=members,n_designs=12000,forward_steps=4000,inverse_steps=4000,description='Fresh paper-only implementation; S2 grids and S5 Adam; main Table 1 nine features including side',sampling_seed=4101,initialisation_seed=4201,calibration_seed=cal['seed'])
+    payload=dict(schema='simie-revised-v1',features=FEATURES,bounds=BOUNDS.tolist(),members=members,n_designs=12000,forward_steps=4000,inverse_steps=4000,description='Fresh paper-only implementation; S2 grids and S5 Adam; eight optical/device inputs; side retained as a design annotation',sampling_seed=4101,initialisation_seed=4201,calibration_seed=cal['seed'])
     (ROOT.parent/'site/assets/networks.json').write_text(json.dumps(payload,separators=(',',':')))
     print('Fresh ensemble complete.',flush=True)
 

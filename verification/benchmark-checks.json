@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "analysis_recomputed": true,
+  "holdouts": [
+    {
+      "name": "nominal",
+      "holdout_designs": 1600,
+      "max_prediction_error": 0.0
+    },
+    {
+      "name": "member-0",
+      "holdout_designs": 2400,
+      "max_prediction_error": 0.0
+    },
+    {
+      "name": "member-1",
+      "holdout_designs": 2400,
+      "max_prediction_error": 0.0
+    },
+    {
+      "name": "member-2",
+      "holdout_designs": 2400,
+      "max_prediction_error": 0.0
+    },
+    {
+      "name": "member-3",
+      "holdout_designs": 2400,
+      "max_prediction_error": 0.0
+    },
+    {
+      "name": "member-4",
+      "holdout_designs": 2400,
+      "max_prediction_error": 0.0
+    }
+  ],
+  "inverse_cases_checked": 15
+}

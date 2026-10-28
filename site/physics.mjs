@@ -29,12 +29,12 @@ export class PaperPhysics{
     if(this.cache.has(key))return this.cache.get(key);
     const lam=this.o.wavelength,flux=this.o.photon_flux;
     const alpha=lam.map(l=>{const shifted=HC/(HC/l-(eg-1.59));return 4*Math.PI*interpolate(this.pvkLambda,this.pvkK,shifted)/shifted;});
-    const w=lam.map((l,j)=>l<HC/eg?flux[j]*Math.exp(-alpha[j]*tp):0);
+    const w=lam.map((l,j)=>l<HC/eg?flux[j]*(1-.826*(1-Math.exp(-alpha[j]*tp))):0);
     const sum=w.reduce((a,b)=>a+b,0);
     const s=this.o.diameter.map((d,i)=>{let value=0;for(let j=0;j<lam.length;j++)value+=this.k[i*lam.length+j]*w[j];return 1.5/d*value/sum;});
     let ideal=0,baseline=0;
     lam.forEach((l,j)=>{if(l<HC/eg){ideal+=flux[j];baseline+=flux[j]*(1-Math.exp(-alpha[j]*tp));}});
-    const out={s,weight:w,ideal:ideal*Q*2/10,baseline:baseline*.83*Q*2/10};
+    const out={s,weight:w,ideal:ideal*Q*2/10,baseline:baseline*.826*Q*2/10};
     if(this.cache.size>=128)this.cache.delete(this.cache.keys().next().value);
     this.cache.set(key,out);return out;
   }
@@ -72,10 +72,10 @@ export class PaperPhysics{
     const minP=x[6]>120?180:1000,maxP=x[6]>120?400:1000;
     if(x[2]<minP-1||x[2]>maxP+1)flags.push({level:'warn',title:'Outside calibration spacing',text:`The ${x[6]>120?'mesoporous':'planar'} anchors use ${minP===maxP?minP:minP+'–'+maxP} nm spacing. Table 1 permits this value, but the prediction is an extrapolation.`});
     if(x[7]===1)flags.push({level:'warn',title:'Back-side response is unspecified',text:'The paper supplies no separate back-side optical kernel. The stated equations give the same response for front and back.'});
-    if(x[6]>120)flags.push({level:'warn',title:'Mesoporous calibration is incomplete',text:'Gamma and delta are unidentified by the calibration anchors because their exposed-cap penalty is zero. Solver zeros do not establish zero uncertainty.'});
+    if(x[6]>120)flags.push({level:'warn',title:'Mesoporous parameter identifiability',text:'Gamma and delta are unidentified by the calibration anchors because their exposed-cap penalty is zero. Solver zeros do not establish zero uncertainty.'});
     return {design:x,best_fit:best,member_responses:rows,...stats,score_mean:score.mean[0],score_std:score.std[0],basis:{S:b.S,G:b.G,Pi:b.Pi,g:b.g,pi:b.pi,grid_mass:b.mass},diagnostics:{finite_positive:finitePositive,budget_pass:budgetPass,ideal_current:b.spectrum.ideal,reference_current:b.spectrum.baseline,member_currents:currents},flags};
   }
   sweep(x){
-    return Array.from({length:51},(_,i)=>{const design=x.slice();design[0]=60+4*i;const r=this.evaluate(design);return {diameter:design[0],mean:r.mean,std:r.std,score:r.score_mean,spread:r.score_std,S:r.basis.S,budget_pass:r.diagnostics.budget_pass};});
+    return Array.from({length:101},(_,i)=>{const design=x.slice();design[0]=60+2*i;const r=this.evaluate(design);return {diameter:design[0],mean:r.mean,std:r.std,score:r.score_mean,spread:r.score_std,S:r.basis.S,budget_pass:r.diagnostics.budget_pass};});
   }
 }

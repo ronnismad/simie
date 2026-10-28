@@ -2,13 +2,11 @@
 
 **Mie-resonant silicon nanoparticle design for perovskite solar cells.**
 
-A computational validation companion implementing the equations and methods in
-`main_PNFA_V2.5.tex` and `SupplPNFA.pdf`. It computes the direct physical model
-in the browser and provides a newly trained forward/inverse ensemble.
-No earlier implementation, saved predictions, neural weights or Mie lookup
-table is loaded. The manuscript and all legacy folders are preserved.
+A computational companion to the revised manuscript and Supplementary Information.
+SiMie evaluates the physical equations in the browser and provides the calibrated
+forward/inverse ensemble used in the revised computational benchmarks.
 
-**App:** https://ronnismad.github.io/simie/
+**[Open SiMie](https://ronnismad.github.io/simie/)**
 
 ## Paper and authors
 
@@ -19,85 +17,77 @@ S. Chatterjee, A. Furasova, S. Makarov.
 School of Physics and Engineering, **ITMO University**, St. Petersburg, Russia;
 Qingdao Innovation and Development Center, Harbin Engineering University, Qingdao, China.
 
-The app displays the paper's title, authors and affiliations. Official ITMO logo
-assets are sourced from the university's [brand resources](https://itmo.ru/ru/page/213/logotipy_i_firmennyy_stil.htm),
-with English/Russian and black/white variants for language and theme.
+ITMO logo assets come from the university's [brand resources](https://itmo.ru/ru/page/213/logotipy_i_firmennyy_stil.htm).
 
-## Validation status
+## Reproduced computational results
 
-The purpose is to reproduce and assess the paper's computational workflow with
-its data and methods held fixed. Numerical implementation checks pass: independent
-Mie calculations, calibration and gradient checks, and Python/browser agreement
-across 116 physical cases plus neural, inverse and selection checks.
-Reproduction of every reported result remains in progress. Passing software
-checks alone does not establish agreement with every figure or experimental result.
-The recorded checks identify the next reproduction tasks; they are not conclusions
-that the paper is incorrect.
+| Calculation | Revised benchmark |
+|---|---|
+| Monodisperse optical descriptor, reference absorber | Maximum at **184 nm** |
+| Reference objective, coupling 0 / 0.3 / 1 / 3 | **186 / 140 / 104 / 68 nm** |
+| Nominal 8,000-design holdout R², current / voltage / fill factor | **0.9670 / 0.9960 / 0.9971** |
+| Calibrated planar current changes, fractions M / L | **11.503% / 12.741%** |
+| Supplement acquisition example: risk-adjusted / uncertainty / maximum-gain diameter | **184 / 158 / 182 nm** |
 
-## Scientific scope
+The optical maximum and device objective are different quantities. The latter
+includes dispersion and array/electrical terms. The acquisition example fixes the
+reference context and uses all 200 calibration resamples over 101 diameters.
+The app's interactive selection explores 512 seeded candidates with the five
+trained networks; it is explicitly labelled exploratory.
 
-- Main-table nine-entry design vector, bounds and 120 nm architecture threshold.
-- Green silicon and Phillips MAPbI3 optical data; nonabsorbing real-index host.
-- Fresh Mie coefficients, absorption, asymmetry and forward-weighted scattering.
-- Printed absorption-deficit weight, with a single irradiance-to-photon conversion.
-- Exact S2 grids: wavelengths 320–900 nm, diameters 50–300 nm, both at 2 nm.
-  The stated trapezoid size average is retained without renormalising tails;
-  zero dispersion is the monodisperse limit. Numerical grid limitations are flagged.
-- Normalised gain with near-field suppression, exposed-cap-only electrical cost,
-  and the printed linearised current, voltage and fill-factor responses.
-- Independently transcribed six Table S1 anchors, nonnegative weighted calibration,
-  200 within-architecture bootstrap resamples and five member coefficient sets.
-- New 12,000-design population, 80/20 split, He-normal tanh networks, full-batch
-  Adam, 4,000 steps per stage/member, frozen-forward tandem inverse and S5's
-  fabrication penalty. P and transport thickness are log-scaled/sampled.
-- Browser-only evaluation, diameter sweeps, inverse targets, finite candidate
-  risk-adjusted selection and next-experiment acquisition. Every proposal is
-  checked against the original physical equations.
+The release checks exported networks against saved holdout populations, checks
+inverse proposals against the direct equations, and compares Python with the
+browser across 116 physical designs. Detailed results are available in the
+[verification report](https://ronnismad.github.io/simie/assets/verification.json).
 
-Provisional shared pixel SDs are 2.0%, 1.0%, 2.6% for relative J, V, FF,
-with 20 pixels per condition, as authorised by the user. Standard errors are
-SD/sqrt(20). These are not recovered condition-specific measurements.
+## Equations and data
 
-## Recorded choices and open reproduction checks
+- Green silicon and Phillips MAPbI₃ optical constants, real-index host, and ASTM
+  G173 global-tilt irradiance converted to photon flux once.
+- Uncollected-photon weight: `w = φ[1 − η(1 − exp(−αt))]`, with `η = 0.826`.
+- Supplement grids: wavelengths 320–900 nm and diameters 50–300 nm, both at 2 nm.
+  Trapezoid lognormal averaging retains the stated finite grid; zero dispersion
+  uses the monodisperse limit.
+- Normalised optical gain, array suppression, exposed-cap electrical penalty,
+  and linearised current, voltage and fill-factor responses.
+- Six calibration conditions; nonnegative weighted least squares; 200 bootstrap
+  resamples per architecture and five selected network members.
+- Provisional shared pixel SDs of 2.0%, 1.0% and 2.6% for current, voltage and
+  fill factor, with an assumed 20 pixels per condition. Standard errors are
+  SD/√20, as disclosed in the Supplement.
 
-The manuscript remains the reference. The following choices make the validation
-run reproducible and identify details to reconcile with the reference calculations:
+## Neural models
 
-1. The printed spectral equation contains lambda/(hc), while its prose calls
-   Phi a photon flux. ASTM supplies irradiance, converted once. Eta=0.83 is
-   mentioned in prose but absent from that equation; it is used only in a
-   separately labelled diagnostic baseline current.
-2. Main Table 1 has nine entries; S5 describes eight forward-network inputs.
-   Nine main-table entries are retained, including side. Doping is represented
-   by the stated factor 1 or 0.85. No back-side optical kernel is invented.
-3. S2's diameter-grid integration loses lognormal tails and can under-resolve
-   very narrow distributions. This implementation preserves that prescription
-   and reports its distribution integral instead of silently repairing it.
-4. Mesoporous gamma/delta are unidentified at the anchors. Solver zeros are
-   conventions, not measurements or evidence of zero uncertainty.
-5. The equations do not saturate at a solar-current limit. Budget failures are
-   diagnostics, not clips or added constraints. Failed proposals are explicitly
-   unvalidated; selection is not reranked under an unstated physical constraint.
-6. The present run returns 260 nm for the diameter sweep, while the paper reports
-   184 nm. Reproducing this result is an open validation task: check the precise
-   reference context, spectral-data preparation and numerical evaluation against
-   the paper's reference calculation. The equations are held fixed during this check.
+The forward network is **8–64–64–64–3**; the bounded tandem inverse is
+**7–64–64–4**. Side remains a design annotation because the optical equations do
+not specify a separate back-side kernel. The inverse receives three targets and
+four context inputs: bandgap, absorber thickness, transport thickness and doping.
 
-Further acceptance checks are to reproduce the reported forward-network accuracy,
-verify inverse proposals against the direct model, and reconcile selected designs
-with the solar-current diagnostic. Current results and errors remain available in
-the numerical audit so that agreement can be assessed without changing the target
-results or concealing incomplete reproduction.
+Spacing and transport thickness are log-scaled; standardisation uses training
+data only. The nominal demonstration uses 8,000 designs (sampling seed 0);
+the calibrated ensemble uses 12,000 designs (seed 4101), an 80/20 split and
+initialisation seed 4201. Bootstrap seed 1 is reset per architecture; member
+selection uses seed 0. Full-batch Adam runs 4,000 steps per stage: learning rate
+0.003 for 2,500 steps, then 0.001; betas 0.9/0.999 and epsilon 1e-8.
+The inverse learns through a frozen forward network with the stated dispersion penalty.
 
-The five-member spread is conditional calibration uncertainty. It does not
-measure shared model error or experimental validation. A necessary check passing
-does not establish device feasibility. Selection searches 512 seeded candidates,
-not a certified continuous global optimum. The acquisition threshold is the upper
-quartile over that same candidate set. Targets can be unreachable.
+## Interpretation
 
-## Run locally
+These are computational reproduction checks. Holdout accuracy measures agreement
+with the physical model, not independent experimental validation. Inverse target
+residuals are reported explicitly; the three first-member current residuals in
+the Supplement are −1.019, −1.151 and −3.874 percentage points.
 
-Python 3.13, Node.js 22 or later:
+The bootstrap spread is conditional calibration variation. Mesoporous cap-loss
+coefficients cannot be identified from zero-cap calibration conditions. The
+finite diameter grid can under-resolve very narrow distributions. The linearised
+response can exceed its physical range under extrapolation; the app retains
+current-budget and positivity checks without clipping the equations. These scope
+conditions are also discussed in the revised manuscript and Supplement.
+
+## Run and verify
+
+Python 3.13 and Node.js 22 or later:
 
 ```text
 python -m pip install -r requirements.txt
@@ -105,57 +95,30 @@ python -B model/build.py --verify-only
 python -B -m unittest discover -s tests -v
 python -B model/verify.py
 node tests/check_browser.mjs
+python -B model/check_benchmarks.py
+python -B model/release.py
+node tests/check_site.mjs
 python -m http.server 8765 --directory site
 ```
 
-Open http://localhost:8765. Use an HTTP server; browsers cannot load module
-workers or scientific assets correctly from a file:// URL. All deployed paths
-are relative, including worker assets, so repository-subpath hosting works.
-There are no runtime CDN, font, analytics, API or backend dependencies.
+Open http://localhost:8765. The interface supports English/Russian, light/dark
+themes, live updates or **Estimate**, and actual network activations.
+Calculations run locally in the browser, without a backend or runtime CDN.
 
-The interface supports English and Russian, light and dark themes, live updates
-or explicit **Estimate**, and a dynamic network diagram displaying actual
-activations of all 64 neurons per hidden layer for a selectable ensemble member.
-Language and theme preferences persist locally; they do not change calculations.
-
-To reproduce training from zero weights (does not consume old weights):
+To recompute benchmark training from initial weights:
 
 ```text
 python -B model/build.py
-python -B model/train.py --workers 2
-python -B model/verify.py
-node tests/check_browser.mjs
-python -B model/release.py
+python -B reproduce_benchmarks.py
+python -B analyse_benchmarks.py
 ```
 
-Sampling seed 4101, network/split seed 4201, bootstrap seed 1703. Learning rate
-0.003 for 2,500 steps then 0.001 to step 4,000; Adam betas 0.9/0.999,
-epsilon 1e-8. Each member uses the same initial seed/split, so bootstrap
-calibration variation is isolated. Forward 9–64–64–64–3; inverse
-(3 targets + 5 context entries)–64–64–4, with bounded outputs for diameter,
-dispersion, spacing and shell. Context fixes bandgap, absorber thickness,
-transport thickness, side and doping. Standardisation uses training data only.
+To train and export the calibrated browser ensemble directly, run
+`python -B model/train.py --workers 2`, then run the verification sequence above.
+Scientific data and model-file paths in these commands refer to files included
+in this repository. Optical input checksums accompany the downloadable release.
 
-## Verification and data
+## Deployment
 
-- Tests use an independent half-integer cylindrical-Bessel formulation to check
-  the Mie coefficients, and check absorption/asymmetry over the full S2 grid.
-- Calibration identifiability, reference normalisation, cap/overlap rules,
-  finite-difference neural gradients, zero dispersion and grid truncation are tested.
-- Browser parity includes all calibration anchors, random designs, boundary and
-  narrow-dispersion cases, fresh network predictions and inverse export.
-- `verification/` contains the numerical audit; `site/assets/verification.json`
-  is the public summary. Passing software tests is not experimental validation.
-- Optical tables are CC0 inputs from refractiveindex.info. ASTM G173 CSV is
-  the reference spectrum distributed by pvlib. Original input hashes are in
-  `site/assets/provenance.json`.
-- Manuscript source SHA256:
-  `ba9531ffb6abe313c168081aefc3eae4df10197fd4d44526e1129f740feb6f97`.
-  The manuscript itself is not included in the public site.
-
-## GitHub Pages
-
-In repository **Settings → Pages**, select **GitHub Actions** as source.
-The included workflow runs physical/browser checks and uploads only `site/`.
-Pushes to `main` deploy; other branches and pull requests run checks only.
-The implementation follows GitHub's [custom workflow documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+GitHub Actions verifies the model and publishes `site/` to GitHub Pages on pushes
+to `main`. The manuscript and response letter are maintained separately.

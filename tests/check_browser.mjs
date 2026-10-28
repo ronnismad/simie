@@ -8,6 +8,13 @@ const kernel=new Float64Array(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffs
 const model=new PaperPhysics(read('../site/assets/optics.json'),kernel,read('../site/assets/calibration.json'));
 const cases=read('../verification/cases.json');
 const actual=cases.designs.map(x=>model.evaluate(x));
+const spectrum=model.spectrum(1.53,880).s;
+assert.equal(model.o.diameter[spectrum.indexOf(Math.max(...spectrum))],184);
+const referenceCurve=model.sweep(model.o.reference);
+for(const [coupling,diameter] of [[0,186],[.3,140],[1,104],[3,68]]){
+ const scores=referenceCurve.map(r=>{const x=model.o.reference.slice();x[0]=r.diameter;const b=model.basis(x);return b.g-coupling*b.pi;});
+ assert.equal(referenceCurve[scores.indexOf(Math.max(...scores))].diameter,diameter);
+}
 let maxResponse=0,maxBasis=0;
 actual.forEach((a,i)=>{
  const b=cases.expected[i];a.best_fit.forEach((v,j)=>{maxResponse=Math.max(maxResponse,Math.abs(v-b.best_fit[j]));});
@@ -25,7 +32,7 @@ try{
   cases.designs.forEach((x,i)=>ensemble.predict(x).mean.forEach((v,j)=>max=Math.max(max,Math.abs(v-cases.network_expected[i][j]))));
   assert.ok(max<1e-10,`Fresh neural export mismatch ${max}`);
   const trace=ensemble.trace(cases.designs[0]);
-  assert.deepEqual(trace.activations.map(layer=>layer.length),[9,64,64,64,3]);
+  assert.deepEqual(trace.activations.map(layer=>layer.length),[8,64,64,64,3]);
   assert.equal(trace.edges.length,4);
   trace.output.forEach((v,j)=>assert.ok(Math.abs(v-ensemble.predict(cases.designs[0]).member_responses[0][j])<1e-12));
   const proposed=ensemble.inverse(cases.target,cases.context);

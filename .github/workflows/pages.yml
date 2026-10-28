@@ -25,6 +25,7 @@ jobs:
       - run: python -B -m unittest discover -s tests -v
       - run: python -B model/verify.py
       - run: node tests/check_browser.mjs
+      - run: python -B model/check_benchmarks.py
       - run: python -B model/release.py
       - run: node tests/check_site.mjs
       - uses: actions/upload-pages-artifact@v4

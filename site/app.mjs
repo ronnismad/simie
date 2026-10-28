@@ -84,7 +84,7 @@ function renderForward(){
   $('#quantities').innerHTML=`<dl class="quantity-grid">${q.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
   draw();const diagram=networkDiagram(current.trace,r.design);if(diagram)$('#network-diagram').innerHTML=diagram;
   $('#estimate-mode-label').textContent=$('#live-update').checked?'Inputs update the estimate':'Estimate on click';
-  lastExport={implementation:'SiMie 1.0',manuscript_sha256:metadata.optics.manuscript_sha256,features:metadata.optics.features,uncertainty_status:metadata.calibration.uncertainty_status,...current};localise();
+  lastExport={implementation:'SiMie 2.0',manuscript_sha256:metadata.optics.manuscript_sha256,features:metadata.optics.features,uncertainty_status:metadata.calibration.uncertainty_status,...current};localise();
 }
 async function evaluate(){
   if(!ready)return;const ticket=++latestEvaluation;clearTimeout(timer);error('');

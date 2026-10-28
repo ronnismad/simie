@@ -15,7 +15,7 @@ class Tests(unittest.TestCase):
  def setUpClass(cls): cls.p=PaperPhysics(np.load(ROOT/'cache/kernel.npy'))
  def test_reference_normalisation(self):
   b,_=self.p.basis(REFERENCE);np.testing.assert_allclose(b,[[1,1]],atol=1e-13)
-  self.assertAlmostEqual(self.p.sref,6.64e-3,delta=1e-5)
+  self.assertAlmostEqual(self.p.sref,0.013623887003006666,delta=1e-13)
  def test_mie_half_integer_bessel_reference(self):
   # Independently assemble each coefficient with cylindrical Bessel functions.
   for d in [100,160,220]:
@@ -60,7 +60,7 @@ class Tests(unittest.TestCase):
   old=x[2,1];x[2,1]=old+eps;plus=loss();x[2,1]=old-eps;minus=loss();x[2,1]=old
   self.assertAlmostEqual(gx[2,1],(plus-minus)/(2*eps),delta=1e-7)
  def test_tandem_gradient_and_frozen_forward(self):
-  rng=np.random.default_rng(19);x=sample(5,13);xs=Standard(encode(x));f=Network([9,5,3],rng);inv=Network([8,5,4],rng,True)
+  rng=np.random.default_rng(19);x=sample(5,13);xs=Standard(encode(x));f=Network([8,5,3],rng);inv=Network([8,5,4],rng,True)
   inputs=rng.normal(size=(5,8));target=rng.normal(size=(5,3));lo=np.array([60,0,150,0]);span=np.array([200,.25,1350,1])
   before=[p.copy() for p in f.params]
   unit=inv.forward(inputs);free=lo+span*unit;proposed=np.column_stack([free,x[:,4:]])

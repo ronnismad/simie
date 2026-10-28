@@ -13,16 +13,16 @@ function summary(rows){
   return {mean,std:mean.map((m,j)=>Math.hypot(...rows.map(r=>r[j]-m))/Math.sqrt(rows.length))};
 }
 export class PaperNetworks{
-  constructor(data){if(data.schema!=='pnfa-paper-v1'||data.members.length!==5)throw Error('Fresh paper ensemble required.');this.data=data;}
+  constructor(data){if(data.schema!=='simie-revised-v1'||data.members.length!==5)throw Error('Fresh paper ensemble required.');this.data=data;}
   predict(x){
-    const encoded=x.slice();[2,6].forEach(j=>encoded[j]=Math.log(encoded[j]));
+    const encoded=[...x.slice(0,7),x[8]];[2,6].forEach(j=>encoded[j]=Math.log(encoded[j]));
     const rows=this.data.members.map(m=>net(scale(encoded,m.x_scaler),m.forward).map((v,j)=>v*m.y_scaler.scale[j]+m.y_scaler.mean[j]));
     const stats=summary(rows),scores=summary(rows.map(r=>[r.reduce((a,b)=>a+b,0)]));
     return {member_responses:rows,...stats,score_mean:scores.mean[0],score_std:scores.std[0],finite_positive:rows.every(r=>r.every(v=>Number.isFinite(v)&&1+v>0))};
   }
   trace(x,index=0){
     const member=this.data.members[index];if(!member)throw Error('Unknown ensemble member.');
-    const encoded=x.slice();[2,6].forEach(j=>encoded[j]=Math.log(encoded[j]));
+    const encoded=[...x.slice(0,7),x[8]];[2,6].forEach(j=>encoded[j]=Math.log(encoded[j]));
     let a=scale(encoded,member.x_scaler);const activations=[a];
     member.forward.W.forEach((w,l)=>{
       a=member.forward.b[l].map((b,j)=>b+w.reduce((s,row,i)=>s+row[j]*a[i],0));
@@ -34,7 +34,7 @@ export class PaperNetworks{
     return {member:index+1,activations,edges,output};
   }
   inverse(target,context){
-    const c=context.slice();c[2]=Math.log(c[2]);
+    const c=[...context.slice(0,3),context[4]];c[2]=Math.log(c[2]);
     return this.data.members.map(m=>{
       const unit=net([...scale(target,m.y_scaler),...scale(c,m.context_scaler)],m.inverse);
       return [...unit.map((u,j)=>this.data.bounds[j][0]+u*(this.data.bounds[j][1]-this.data.bounds[j][0])),...context];

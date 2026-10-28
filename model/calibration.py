@@ -23,11 +23,12 @@ def fit(basis,y):
     t[active]=nnls(a[:,active],b)[0]
     return t
 
-def calibrate(physics,seed=1703):
-    basis,mass=physics.basis(DESIGNS);rng=np.random.default_rng(seed)
+def calibrate(physics,seed=1):
+    basis,mass=physics.basis(DESIGNS)
     coefficients=[];boots=[]
     for indices in [np.arange(2),np.arange(2,6)]:
+        rng=np.random.default_rng(seed)
         coefficients.append(fit(basis[indices],OBSERVED[indices]))
         boots.append([fit(basis[j],OBSERVED[j]) for j in (rng.choice(indices,len(indices),replace=True) for _ in range(200))])
-    boots=np.array(boots);choices=np.random.default_rng(seed+1).choice(200,5,replace=False)
-    return dict(coefficients=np.array(coefficients).tolist(),bootstrap=boots.tolist(),member_coefficients=boots[:,choices].transpose(1,0,2).tolist(),member_indices=choices.tolist(),seed=seed,names=NAMES,designs=DESIGNS.tolist(),observed=OBSERVED.tolist(),predicted=response(DESIGNS,basis,coefficients).tolist(),pixel_std=STD.tolist(),pixels=PIXELS,standard_errors=SE.tolist(),uncertainty_status='provisional shared estimates, authorised by the user',unidentified={'mesoporous':['gamma','delta']},captured_probability=mass.tolist())
+    boots=np.array(boots);choices=np.random.default_rng(0).choice(200,5,replace=False)
+    return dict(coefficients=np.array(coefficients).tolist(),bootstrap=boots.tolist(),member_coefficients=boots[:,choices].transpose(1,0,2).tolist(),member_indices=choices.tolist(),seed=seed,names=NAMES,designs=DESIGNS.tolist(),observed=OBSERVED.tolist(),predicted=response(DESIGNS,basis,coefficients).tolist(),pixel_std=STD.tolist(),pixels=PIXELS,standard_errors=SE.tolist(),uncertainty_status='provisional shared pixel scatter and assumed sample count; Supplement S4',unidentified={'mesoporous':['gamma','delta']},captured_probability=mass.tolist())

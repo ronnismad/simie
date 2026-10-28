@@ -1,4 +1,4 @@
-"""Independent implementation of main_PNFA_V2.5 and Supplement S1-S3.
+"""Independent implementation of the revised manuscript and Supplement S1-S3.
 
 The wavelength and diameter grids and trapezoid rule are exactly S2's.
 No legacy model code, weights, kernels or predictions are loaded.
@@ -81,7 +81,7 @@ class PaperPhysics:
         self.piref=np.pi*160*100/1e6
 
     def spectral(self,eg,tp):
-        w=photon_flux()*np.exp(-absorption(eg)*tp)
+        w=photon_flux()*(1-.826*(1-np.exp(-absorption(eg)*tp)))
         w=np.where(WAVELENGTH<HC/eg,w,0)
         return 1.5/DIAMETER*(self.kernel@w)/w.sum()
 
@@ -89,7 +89,7 @@ class PaperPhysics:
         x=np.atleast_2d(x); result=np.empty(len(x)); captured=np.empty(len(x))
         # Batch spectra, followed by S2 trapezoid integration. No tail renormalisation.
         for start in range(0,len(x),512):
-            a=x[start:start+512]; w=photon_flux()[:,None]*np.exp(-absorption(a[:,4,None],WAVELENGTH[None,:]).T*a[:,5])
+            a=x[start:start+512]; w=photon_flux()[:,None]*(1-.826*(1-np.exp(-absorption(a[:,4,None],WAVELENGTH[None,:]).T*a[:,5])))
             w=np.where(WAVELENGTH[:,None]<HC/a[:,4],w,0)
             values=(1.5/DIAMETER[:,None])*(self.kernel@w)/w.sum(axis=0)
             for k,row in enumerate(a):

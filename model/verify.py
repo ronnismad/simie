@@ -24,7 +24,7 @@ def main():
    f=reconstruct(member['forward']);inv=reconstruct(member['inverse'])
    enc=lambda z,s:(z-np.array(s['mean']))/np.array(s['scale'])
    yp=f.forward(enc(encode(x),member['x_scaler']))*member['y_scaler']['scale']+member['y_scaler']['mean'];predictions.append(yp)
-   c=np.array([cases['context']]);c[:,2]=np.log(c[:,2])
+   c=np.array([cases['context']])[:,[0,1,2,4]];c[:,2]=np.log(c[:,2])
    inp=np.column_stack([enc(np.array([cases['target']]),member['y_scaler']),enc(c,member['context_scaler'])])
    lo=np.array(data['bounds'])[:4,0];span=np.diff(np.array(data['bounds'])[:4],axis=1).ravel()
    design=np.column_stack([lo+span*inv.forward(inp),np.array([cases['context']])])[0];inverses.append(design.tolist())
