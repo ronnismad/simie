@@ -1,0 +1,5 @@
+Selected by the user: option 3, 29 October 2026.
+Prepared with the built-in image generation tool from simie-logo-options.png.
+App asset: site/branding/simie-logo-3.png
+
+Edit the supplied comparison board. Extract ONLY the icon from concept number 3 in the upper-right cell: a glossy deep navy silicon sphere with a pale blue highlight, resting on a gold resonance halo above a teal, gold, navy and gray solar-cell layer stack. Preserve that exact design, proportions, palette and visual details. Deliver one isolated app logo icon, centered and tightly framed with modest padding on a square transparent canvas. Remove ALL text including SiMie and the number 3, remove all other cells and grid lines. Genuine transparent background. Do not add new design elements. Output icon only.
