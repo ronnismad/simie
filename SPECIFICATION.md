@@ -25,7 +25,7 @@ transport thickness (selecting architecture), side and doping. The four bounded
 free quantities are diameter, dispersion, spacing and shell. Fixing doping as
 context is explicit; it is not differentiated as a continuous binary decision.
 
-## Conflicts requiring a declared interpretation
+## Recorded implementation choices for validation
 
 - Main text versus S5: nine design inputs versus eight network inputs. Follow
   the main-table nine inputs; no invented side dependence in physical labels.

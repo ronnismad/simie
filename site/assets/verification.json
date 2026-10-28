@@ -213,12 +213,12 @@
     "model/verify.py": "bd7b94e924b9e1b28a3f29589c24cb58f047dd721d5a373ecc9c5657c004e246",
     "site/app.mjs": "3c6e440d60c3121c2d46b473679a9dda85b8bae02a34dad1567d802688d62d21",
     "site/diagram.mjs": "f1e11898612b7a5b8c7780d9275c03fe0dd0c4855f40f14211c73f228ba6086a",
-    "site/i18n.mjs": "a8688490f728733d708e3e5e63d21bccb90a886de2058b37e14a5a5a349c3d86",
-    "site/index.html": "09e1bb133e44bfb1f071685adf2e870864d9118f61b072904185609b97dd40eb",
+    "site/i18n.mjs": "279532d9ec95979cd2c455384877f0ff291020c1d89f7a150c4434c8505bdd61",
+    "site/index.html": "f7fbc0f06d7cbd543b5c9f298d95149eed883cd2602b30bc1b5f995ea5eca9a3",
     "site/networks.mjs": "1b507f6b71cabc73824f5055fbebfbe6ddac7092d13e0eeb3ece0b120ff3d9ca",
     "site/physics.mjs": "7b568faad03b841b8e4caede4ae565c065e1e93043d280c4533ac408304b8f47",
     "site/style.css": "62a3c57b16bdeca6e989eca3061cba9c876f1630a01152751455207a294fb1dc",
-    "site/theme.css": "68531d937070a84effed545dbc850e070d32d4d1ef6e745663e4bc85d356b563",
+    "site/theme.css": "e898a4e6e03fd971f9a3415f4712416d17beb1ad2eee4e342993c3e9c8116679",
     "site/worker.mjs": "11ce21852c64bba40d8faf7fbef787b109760ee2dec18106178804b20372e7ca"
   }
 }

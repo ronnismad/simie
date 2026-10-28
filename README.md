@@ -2,13 +2,37 @@
 
 **Mie-resonant silicon nanoparticle design for perovskite solar cells.**
 
-A fresh, auditable implementation of the equations and methods in
+A computational validation companion implementing the equations and methods in
 `main_PNFA_V2.5.tex` and `SupplPNFA.pdf`. It computes the direct physical model
 in the browser and provides a newly trained forward/inverse ensemble.
 No earlier implementation, saved predictions, neural weights or Mie lookup
 table is loaded. The manuscript and all legacy folders are preserved.
 
 **App:** https://ronnismad.github.io/simie/
+
+## Paper and authors
+
+**Machine-Learned Selection of the Size and Placement of Mie-Resonant Silicon Nanoparticles in Perovskite Solar Cells**
+
+S. Chatterjee, A. Furasova, S. Makarov.
+
+School of Physics and Engineering, **ITMO University**, St. Petersburg, Russia;
+Qingdao Innovation and Development Center, Harbin Engineering University, Qingdao, China.
+
+The app displays the paper's title, authors and affiliations. Official ITMO logo
+assets are sourced from the university's [brand resources](https://itmo.ru/ru/page/213/logotipy_i_firmennyy_stil.htm),
+with English/Russian and black/white variants for language and theme.
+
+## Validation status
+
+The purpose is to reproduce and assess the paper's computational workflow with
+its data and methods held fixed. Numerical implementation checks pass: independent
+Mie calculations, calibration and gradient checks, and Python/browser agreement
+across 116 physical cases plus neural, inverse and selection checks.
+Reproduction of every reported result remains in progress. Passing software
+checks alone does not establish agreement with every figure or experimental result.
+The recorded checks identify the next reproduction tasks; they are not conclusions
+that the paper is incorrect.
 
 ## Scientific scope
 
@@ -34,9 +58,10 @@ Provisional shared pixel SDs are 2.0%, 1.0%, 2.6% for relative J, V, FF,
 with 20 pixels per condition, as authorised by the user. Standard errors are
 SD/sqrt(20). These are not recovered condition-specific measurements.
 
-## Specification decisions (do not hide these)
+## Recorded choices and open reproduction checks
 
-The supplied paper cannot be implemented without resolving conflicting text:
+The manuscript remains the reference. The following choices make the validation
+run reproducible and identify details to reconcile with the reference calculations:
 
 1. The printed spectral equation contains lambda/(hc), while its prose calls
    Phi a photon flux. ASTM supplies irradiance, converted once. Eta=0.83 is
@@ -53,8 +78,16 @@ The supplied paper cannot be implemented without resolving conflicting text:
 5. The equations do not saturate at a solar-current limit. Budget failures are
    diagnostics, not clips or added constraints. Failed proposals are explicitly
    unvalidated; selection is not reranked under an unstated physical constraint.
-6. Direct optical evaluation gives a boundary maximum at 260 nm in the main
-   design interval. Reported 184 nm is not a target used to adjust the code.
+6. The present run returns 260 nm for the diameter sweep, while the paper reports
+   184 nm. Reproducing this result is an open validation task: check the precise
+   reference context, spectral-data preparation and numerical evaluation against
+   the paper's reference calculation. The equations are held fixed during this check.
+
+Further acceptance checks are to reproduce the reported forward-network accuracy,
+verify inverse proposals against the direct model, and reconcile selected designs
+with the solar-current diagnostic. Current results and errors remain available in
+the numerical audit so that agreement can be assessed without changing the target
+results or concealing incomplete reproduction.
 
 The five-member spread is conditional calibration uncertainty. It does not
 measure shared model error or experimental validation. A necessary check passing
