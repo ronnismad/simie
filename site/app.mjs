@@ -1,10 +1,10 @@
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=usability-6';
+import {localise,language,setLanguage} from './i18n.mjs?v=usability-7';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const inputHelp=["Mean diameter of the silicon particles.", "Standard deviation divided by mean diameter; 0 means a single size.", "Mean centre-to-centre distance between particles.", "Covered fraction of the particle surface: 0 is bare, 1 is fully covered.", "Bandgap of the perovskite absorber.", "Thickness of the light-absorbing perovskite layer.", "Sets the device architecture: planar up to 120 nm, mesoporous above 120 nm."];
+const inputHelp=["Mean diameter of the silicon particles.", "Standard deviation divided by mean diameter; 0 means a single size.", "Density-based spacing P = nA⁻¹ᐟ², where nA is the number of particles per unit area. It equals centre-to-centre pitch for a square array; for disorder it is an effective spacing.", "Fraction of the exposed cap covered by a transport-layer shell: 0 is uncovered, 1 is fully covered.", "Bandgap of the perovskite absorber.", "Thickness of the light-absorbing perovskite layer.", "Sets the device architecture: planar up to 120 nm, mesoporous above 120 nm."];
 const definitions=[
  ['Mean diameter','nm',60,260,1,160],['Relative dispersion','σ/d',0,.25,.001,.1],
  ['Mean spacing','nm',150,1500,1,1000],['Shell coverage','fraction',0,1,.01,0],

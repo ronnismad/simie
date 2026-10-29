@@ -5,8 +5,8 @@
   <meta name="description" content="SiMie: Mie-resonant silicon nanoparticle design for perovskite solar cells. Direct equations, calibrated responses and tandem inverse design.">
   <meta name="theme-color" content="#143e48"><title>SiMie · Silicon nanoparticle design</title>
   <script src="./appearance.js"></script>
-  <link rel="icon" href="./branding/simie-logo-3.png" type="image/png"><link rel="apple-touch-icon" href="./branding/simie-logo-3.png"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./theme.css?v=usability-6">
-  <script type="module" src="./app.mjs?v=usability-6"></script>
+  <link rel="icon" href="./branding/simie-logo-3.png" type="image/png"><link rel="apple-touch-icon" href="./branding/simie-logo-3.png"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./theme.css?v=usability-7">
+  <script type="module" src="./app.mjs?v=usability-7"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to workspace</a>
@@ -67,7 +67,7 @@
   <section id="page-inverse" class="page" hidden>
     <div class="page-heading"><div><div class="eyebrow">TANDEM NETWORK / FROZEN FORWARD SURROGATE</div><h1>Start with a target.</h1><p>Request a response. Inspect five candidate geometries against the direct physical model.</p></div></div>
     <div class="panel explainer"><span class="round-icon">↗</span><p>The inverse network proposes diameter, dispersion, spacing and shell coverage. Device context is taken from the Design explorer. A target may be unreachable; proposals are verified, never presented as guaranteed solutions.</p><a href="#explorer">Edit context →</a></div>
-    <form id="inverse-form" class="panel action-form"><label>Target ΔJ<sub>sc</sub>/J<sub>sc</sub> (%)<input type="number" id="target-J" value="12" step="0.1" required></label><label>Target ΔV<sub>oc</sub>/V<sub>oc</sub> (%)<input type="number" id="target-V" value="2" step="0.1" required></label><label>Target ΔFF/FF (%)<input type="number" id="target-FF" value="0" step="0.1" required></label><button class="button primary" type="submit" id="inverse-button" disabled>Propose designs →</button></form>
+    <form id="inverse-form" class="panel action-form"><label><span class="target-label">Target ΔJ<sub>sc</sub>/J<sub>sc</sub> (%)</span><input type="number" id="target-J" value="12" step="0.1" required></label><label><span class="target-label">Target ΔV<sub>oc</sub>/V<sub>oc</sub> (%)</span><input type="number" id="target-V" value="2" step="0.1" required></label><label>Target ΔFF/FF (%)<input type="number" id="target-FF" value="0" step="0.1" required></label><button class="button primary" type="submit" id="inverse-button" disabled>Propose designs →</button></form>
     <p class="micro context-display"></p><div id="inverse-results" class="empty-state"><div class="empty-symbol">⤢</div><h2>A target can have several solutions.</h2><p>Run the tandem ensemble to compare five bounded proposals, target errors and scientific checks.</p></div>
   </section>
   <section id="page-selection" class="page" hidden>
