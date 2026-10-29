@@ -27,3 +27,5 @@ html[data-theme=dark] a{transition:background .15s;}
 html[data-theme=dark] .brand{color:var(--ink)}
 html[data-theme=dark] .result-guide a,html[data-theme=dark] .sidebar-info a,html[data-theme=dark] .text-button{color:var(--teal)}
 @media(max-width:640px){.chart-panel .panel-heading{flex-direction:column;align-items:stretch}.chart-panel select{width:100%;max-width:none;min-height:40px;font-size:12px}}
+
+.placement-panel{padding:22px 24px;margin-bottom:20px;scroll-margin-top:90px}.placement-panel figure{margin:0 0 12px}.placement-panel img{display:block;width:100%;height:auto;background:white;border-radius:6px}.placement-panel figcaption{font-size:12px;line-height:1.65;color:var(--muted)}.placement-panel figcaption p{margin-top:12px}.placement-panel ul{padding-left:20px}.placement-panel li+li{margin-top:8px}.placement-panel>a,.placement-link{font-size:12px}.placement-link{margin-top:16px}@media(max-width:640px){.placement-panel{padding:18px}}
