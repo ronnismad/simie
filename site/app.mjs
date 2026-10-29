@@ -1,9 +1,10 @@
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=wording-review-5';
+import {localise,language,setLanguage} from './i18n.mjs?v=usability-6';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inputHelp=["Mean diameter of the silicon particles.", "Standard deviation divided by mean diameter; 0 means a single size.", "Mean centre-to-centre distance between particles.", "Covered fraction of the particle surface: 0 is bare, 1 is fully covered.", "Bandgap of the perovskite absorber.", "Thickness of the light-absorbing perovskite layer.", "Sets the device architecture: planar up to 120 nm, mesoporous above 120 nm."];
 const definitions=[
  ['Mean diameter','nm',60,260,1,160],['Relative dispersion','σ/d',0,.25,.001,.1],
  ['Mean spacing','nm',150,1500,1,1000],['Shell coverage','fraction',0,1,.01,0],
@@ -35,7 +36,7 @@ function route(){
 function controls(){
   definitions.forEach(([label,unit,min,max,step,value],i)=>{
     const div=document.createElement('div');div.className='control';
-    div.innerHTML=`<div class="control-top"><label for="value-${i}">${label}</label><div class="input-unit"><input type="number" id="value-${i}" min="${min}" max="${max}" step="any" value="${value}" required aria-label="${label} (${unit})"><span>${unit}</span></div></div><input type="range" id="slider-${i}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label} slider"><div class="range-ends"><span>${min}</span><span>${max}</span></div>`;
+    div.innerHTML=`<div class="control-top"><label for="value-${i}">${label}</label><div class="input-unit"><input type="number" id="value-${i}" min="${min}" max="${max}" step="any" value="${value}" required aria-describedby="help-${i}" aria-label="${label} (${unit})"><span>${unit}</span></div></div><input type="range" id="slider-${i}" min="${min}" max="${max}" step="${step}" value="${value}" aria-describedby="help-${i}" aria-label="${label} slider"><p class="field-help" id="help-${i}">${inputHelp[i]}</p><div class="range-ends"><span>${min}</span><span>${max}</span></div>`;
     $(i<4?'#particle-controls':'#device-controls').append(div);
     for(const mode of ['value','slider'])$(`#${mode}-${i}`).addEventListener('input',()=>{
       const from=$(`#${mode}-${i}`),to=$(`#${mode==='value'?'slider':'value'}-${i}`);to.value=from.value;
@@ -45,7 +46,8 @@ function controls(){
   for(const id of ['side','doping'])$(`#${id}`).addEventListener('change',()=>{$('#preset').value='custom';updateContext();schedule();});
   updateContext();
 }
-function schedule(){clearTimeout(timer);++latestEvaluation;$('#evaluate').disabled=!ready;$('#export-result').disabled=true;$('#stale-notice').hidden=false;if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
+function setEstimateDisabled(value){$('#evaluate').disabled=value;$('#estimate-bottom').disabled=value;}
+function schedule(){clearTimeout(timer);++latestEvaluation;setEstimateDisabled(!ready);$('#export-result').disabled=true;$('#stale-notice').hidden=false;if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
 function draw(){
   if(!current)return;
   const mode=$('#chart-mode').value,rows=current.curve,xDesign=current.evaluation.design[0];
@@ -78,6 +80,8 @@ function renderForward(){
   $('#diagnostics').innerHTML=checks.map(c=>`<div class="check-row ${c.level}"><span class="check-dot"></span><div><h3>${escape(c.title)}</h3><p>${escape(c.text)}</p></div></div>`).join('');
   const failed=!r.diagnostics.budget_pass||!r.diagnostics.finite_positive;
   const review=checks.some(c=>c.level==='warn');
+  $('#result-guidance').textContent=failed?'Failed physical checks. These results are diagnostic only; this design is not recommended for an experiment.':'Review the scientific checks below. Passing necessary checks does not establish experimental feasibility.';
+  $('#result-guidance').className=failed?'message error':'micro';
   $('#check-badge').textContent=failed?'Unvalidated · failed check':review?'Limits to review':'Necessary checks passed';
   $('#check-badge').className=`badge ${failed?'error':review?'warn':''}`;
   const q=[['Optical descriptor S̄',`${r.basis.S.toExponential(6)} nm⁻¹`],['Normalised gain G/Gref',number(r.basis.g)],['Normalised cap penalty Π/Πref',number(r.basis.pi)],['S2 distribution integral',r.basis.grid_mass.toFixed(6)],['Diagnostic baseline current',`${number(r.diagnostics.reference_current)} mA/cm²`],['Unity-collection ceiling',`${number(r.diagnostics.ideal_current)} mA/cm²`]];
@@ -89,10 +93,10 @@ function renderForward(){
 async function evaluate(){
   if(!ready)return;const ticket=++latestEvaluation;clearTimeout(timer);error('');
   if(!$('#design-form').reportValidity())return;
-  $('#evaluate').disabled=true;$('#export-result').disabled=true;$('#forward-results').setAttribute('aria-busy','true');
+  setEstimateDisabled(true);$('#export-result').disabled=true;$('#forward-results').setAttribute('aria-busy','true');
   try{const result=await request('evaluate',readDesign());if(ticket!==latestEvaluation)return;let member=result.trace?.member-1;while(metadata.networks_available&&member!==Number($('#network-member').value)){member=Number($('#network-member').value);result.trace=await request('trace',{design:result.evaluation.design,member});if(ticket!==latestEvaluation)return;}current=result;renderForward();$('#export-result').disabled=false;}
   catch(e){if(ticket===latestEvaluation)error(e.message);}
-  finally{if(ticket===latestEvaluation){$('#evaluate').disabled=false;$('#forward-results').setAttribute('aria-busy','false');}}
+  finally{if(ticket===latestEvaluation){setEstimateDisabled(false);$('#forward-results').setAttribute('aria-busy','false');}}
 }
 function proposalHTML(r,title,id,target=null,memberIndex=null,prediction=null){
   const x=r.design,failed=!r.diagnostics.budget_pass||!r.diagnostics.finite_positive;
@@ -115,7 +119,7 @@ function themeState(){const dark=document.documentElement.dataset.theme==='dark'
 themeState();$('#theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('simie-theme',document.documentElement.dataset.theme);}catch{}themeState();});
 $('#live-update').addEventListener('change',()=>{clearTimeout(timer);$('#estimate-mode-label').textContent=$('#live-update').checked?'Inputs update the estimate':'Estimate on click';localise();if($('#live-update').checked)evaluate();});
 $('#network-member').addEventListener('change',async()=>{if(!current)return;const design=current.evaluation.design.slice(),key=JSON.stringify(design),member=Number($('#network-member').value);try{const trace=await request('trace',{design,member});if(trace&&JSON.stringify(current.evaluation.design)===key&&Number($('#network-member').value)===member){current.trace=trace;if(lastExport)lastExport.trace=trace;$('#network-diagram').innerHTML=networkDiagram(trace,design);localise();}}catch(e){error(e.message);}});
-$('#design-form').addEventListener('submit',e=>{e.preventDefault();evaluate();});
+$('#design-form').addEventListener('submit',async e=>{e.preventDefault();await evaluate();if(e.submitter?.id==='estimate-bottom')$('#forward-results').scrollIntoView({block:'start'});});
 $('#reset').addEventListener('click',()=>{if(!ready)return;setDesign(metadata.optics.reference);$('#preset').value='reference';evaluate();});
 $('#preset').addEventListener('change',()=>{if(!ready||$('#preset').value==='custom')return;setDesign($('#preset').value==='reference'?metadata.optics.reference:metadata.calibration.designs[Number($('#preset').value)]);evaluate();});
 $('#chart-mode').addEventListener('change',draw);
@@ -138,7 +142,7 @@ try{
   const shared=new URL(location.href).searchParams.get('design');
   if(shared){const x=shared.split(',').map(Number);if(x.length!==9||!x.every(Number.isFinite))throw Error('The shared design link is invalid.');setDesign(x);$('#preset').value='custom';}
   else setDesign(metadata.optics.reference);
-  populateMethods();$('#runtime').textContent='Calculated in your browser';$('#evaluate').disabled=false;$('#reset').disabled=false;
+  populateMethods();$('#runtime').textContent='Calculated in your browser';setEstimateDisabled(false);$('#reset').disabled=false;
   $('#inverse-button').disabled=$('#selection-button').disabled=!metadata.networks_available;
   localise();
   await evaluate();
