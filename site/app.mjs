@@ -1,6 +1,6 @@
 import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=placement-engineering-10';
+import {localise,language,setLanguage} from './i18n.mjs?v=placement-workflow-11';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -21,6 +21,11 @@ function error(message){if(message.startsWith('Missing model asset:'))message='A
 function notify(text){$('#toast').textContent=text;$('#toast').hidden=false;localise();setTimeout(()=>$('#toast').hidden=true,4000);}
 function download(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function readDesign(){const x=definitions.map((_,i)=>{const el=$(`#value-${i}`);if(!el.value.trim())throw Error('Complete all design fields.');return Number(el.value);});return [...x,Number($('#side').value),Number($('#doping').value)];}
+function placementStatus(){
+ const valid=$('#design-form').checkValidity();
+ $('#placement-status').textContent=!valid?'Use valid inputs before estimating or exporting.':!$('#stale-notice').hidden?($('#live-update').checked?'Live estimate is updating…':'Geometry changed. Estimate to update the numerical results.'):'Numerical results match the current inputs.';
+ localise();
+}
 function refreshPlacement(){
   const ids=['value-0','value-6','value-3'],valid=ids.every(id=>$('#'+id)?.checkValidity());
   const [d,t,c]=ids.map(id=>Number($('#'+id)?.value)),back=$('#side').value==='1';
@@ -28,6 +33,7 @@ function refreshPlacement(){
   for(const [key,value] of [['d',d],['t',t],['c',c*100],['side',back?'1':'0']]){const el=$('#placement-'+key);if(document.activeElement!==el)el.value=Number.isFinite(Number(value))?value:'';}
   $('#placement-values').innerHTML=valid?`<span>${back?'Back placement':'Front placement'}</span> · <span>${t>120?'Mesoporous':'Planar'}</span> · d = ${d} nm · t = ${t} nm · <span>Exposed cap height</span>: h = ${Math.max(0,d-t)} nm · c_shell = ${Number((c*100).toFixed(6))}%`:'';
   requestAnimationFrame(()=>{const el=$('#live-placement');if(el.clientWidth>0)el.scrollLeft=Math.max(0,(el.scrollWidth-el.clientWidth)/2);});
+  $('#placement-export').disabled=!valid;
   $('#placement-back').hidden=!valid||!back;
   $('#placement-buried').hidden=!valid||d>t;
 }
@@ -58,8 +64,8 @@ function controls(){
   for(const id of ['side','doping'])$(`#${id}`).addEventListener('change',()=>{$('#preset').value='custom';updateContext();schedule();});
   updateContext();
 }
-function setEstimateDisabled(value){$('#evaluate').disabled=value;$('#estimate-bottom').disabled=value;}
-function schedule(){clearTimeout(timer);++latestEvaluation;setEstimateDisabled(!ready);$('#export-result').disabled=true;$('#stale-notice').hidden=false;if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
+function setEstimateDisabled(value){$('#evaluate').disabled=value;$('#estimate-bottom').disabled=value;$('#placement-estimate').disabled=value;}
+function schedule(){clearTimeout(timer);++latestEvaluation;setEstimateDisabled(!ready);$('#export-result').disabled=true;$('#stale-notice').hidden=false;placementStatus();if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
 function draw(){
   if(!current)return;
   const mode=$('#chart-mode').value,rows=current.curve,xDesign=current.evaluation.design[0];
@@ -84,7 +90,7 @@ function draw(){
 }
 function renderForward(){
   const r=current.evaluation;
-  $('#stale-notice').hidden=true;
+  $('#stale-notice').hidden=true;placementStatus();
   $('#metrics').innerHTML=['Short-circuit current','Open-circuit voltage','Fill factor'].map((label,j)=>`<article class="metric"><span>${label}</span><h3>${['J<sub>sc</sub>','V<sub>oc</sub>','FF'][j]}</h3><strong>${pct(r.mean[j])}</strong><small>± ${(100*r.std[j]).toFixed(2)}% ensemble SD<br>Full-data fit: ${pct(r.best_fit[j])}</small></article>`).join('');
   const checks=[{level:'ok',title:'Direct paper-equation evaluation',text:'Mie lookup, spectral weighting, S2 size average and exposed-cap response; no output clipping.'},...r.flags];
   if(r.diagnostics.budget_pass&&r.diagnostics.finite_positive)checks.push({level:'ok',title:'Necessary physical checks passed',text:'For all five members, absolute current, voltage and fill factor are positive and finite, and current is below the diagnostic ceiling. Relative changes may be negative. This does not establish device feasibility.'});
@@ -128,7 +134,16 @@ function populateMethods(){
 for(const [key,source,scale] of [['d','value-0',1],['t','value-6',1],['c','value-3',.01],['side','side',1]]){
  $('#placement-'+key).addEventListener(key==='side'?'change':'input',e=>{const target=$('#'+source);target.value=e.target.value===''?'':Number(e.target.value)*scale;target.dispatchEvent(new Event(key==='side'?'change':'input',{bubbles:true}));});
 }
-$('#placement-zoom').addEventListener('click',()=>{const enlarged=$('#live-placement').classList.toggle('enlarged');$('#live-placement').scrollLeft=Math.max(0,($('#live-placement').scrollWidth-$('#live-placement').clientWidth)/2);$('#placement-zoom').setAttribute('aria-pressed',String(enlarged));$('#placement-zoom').textContent=enlarged?'Standard view':'Enlarge diagram';localise();});
+function placementView(fit){const el=$('#live-placement');el.classList.toggle('fit-view',fit);el.classList.remove('enlarged');$('#placement-fit').setAttribute('aria-pressed',String(fit));$('#placement-detail').setAttribute('aria-pressed',String(!fit));$('#placement-zoom').setAttribute('aria-pressed','false');$('#placement-zoom').textContent='Enlarge diagram';el.scrollLeft=Math.max(0,(el.scrollWidth-el.clientWidth)/2);localise();}
+$('#placement-fit').addEventListener('click',()=>placementView(true));
+$('#placement-detail').addEventListener('click',()=>placementView(false));
+$('#placement-export').addEventListener('click',()=>{
+ const source=$('#live-placement svg');if(!source)return;
+ const svg=source.cloneNode(true);svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+ const desc=document.createElementNS('http://www.w3.org/2000/svg','desc');desc.textContent=$('#placement-values').textContent+' '+($('#placement-back').hidden?'':$('#placement-back').textContent)+' '+$('#particle-placement .micro').textContent;svg.prepend(desc);
+ const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='simie-particle-geometry.svg';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+$('#placement-zoom').addEventListener('click',()=>{$('#live-placement').classList.remove('fit-view');const enlarged=$('#live-placement').classList.toggle('enlarged');$('#placement-fit').setAttribute('aria-pressed','false');$('#placement-detail').setAttribute('aria-pressed',String(!enlarged));$('#live-placement').scrollLeft=Math.max(0,($('#live-placement').scrollWidth-$('#live-placement').clientWidth)/2);$('#placement-zoom').setAttribute('aria-pressed',String(enlarged));$('#placement-zoom').textContent=enlarged?'Standard view':'Enlarge diagram';localise();});
 controls();route();window.addEventListener('hashchange',route);
 $('#language').value=language();$('#language').addEventListener('change',()=>{setLanguage($('#language').value);route();});
 function themeState(){const dark=document.documentElement.dataset.theme==='dark';$('#theme-toggle').setAttribute('aria-pressed',String(dark));$('#theme-toggle span').textContent=dark?'Light mode':'Dark mode';localise();}
