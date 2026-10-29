@@ -29,3 +29,5 @@ html[data-theme=dark] .result-guide a,html[data-theme=dark] .sidebar-info a,html
 @media(max-width:640px){.chart-panel .panel-heading{flex-direction:column;align-items:stretch}.chart-panel select{width:100%;max-width:none;min-height:40px;font-size:12px}}
 
 .placement-panel{padding:22px 24px;margin-bottom:20px;scroll-margin-top:90px}.placement-panel figure{margin:0 0 12px}.placement-panel img{display:block;width:100%;height:auto;background:white;border-radius:6px}.placement-panel figcaption{font-size:12px;line-height:1.65;color:var(--muted)}.placement-panel figcaption p{margin-top:12px}.placement-panel ul{padding-left:20px}.placement-panel li+li{margin-top:8px}.placement-panel>a,.placement-link{font-size:12px}.placement-link{margin-top:16px}@media(max-width:640px){.placement-panel{padding:18px}}
+
+#live-placement svg{display:block;width:100%;height:auto;border-radius:6px;margin:14px 0}.placement-reference{margin-top:18px}.placement-reference summary{cursor:pointer;font-size:13px;margin-bottom:12px}#placement-values{font-size:13px;margin-bottom:10px}#placement-back,#placement-buried{margin-bottom:10px}

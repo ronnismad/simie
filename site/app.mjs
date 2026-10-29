@@ -1,5 +1,6 @@
+import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=placement-8';
+import {localise,language,setLanguage} from './i18n.mjs?v=placement-live-9';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -20,7 +21,16 @@ function error(message){if(message.startsWith('Missing model asset:'))message='A
 function notify(text){$('#toast').textContent=text;$('#toast').hidden=false;localise();setTimeout(()=>$('#toast').hidden=true,4000);}
 function download(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function readDesign(){const x=definitions.map((_,i)=>{const el=$(`#value-${i}`);if(!el.value.trim())throw Error('Complete all design fields.');return Number(el.value);});return [...x,Number($('#side').value),Number($('#doping').value)];}
+function refreshPlacement(){
+  const ids=['value-0','value-6','value-3'],valid=ids.every(id=>$('#'+id)?.checkValidity());
+  const [d,t,c]=ids.map(id=>Number($('#'+id)?.value)),back=$('#side').value==='1';
+  $('#live-placement').innerHTML=valid?placementDiagram(d,t,c,back):'<p class="micro">Enter valid diameter, transport thickness and shell coverage to display the geometry.</p>';
+  $('#placement-values').innerHTML=valid?`<span>${back?'Back placement':'Front placement'}</span> · <span>${t>120?'Mesoporous':'Planar'}</span> · d = ${d} nm · t = ${t} nm · <span>Exposed cap height</span>: h = ${Math.max(0,d-t)} nm · c_shell = ${c}`:'';
+  $('#placement-back').hidden=!valid||!back;
+  $('#placement-buried').hidden=!valid||d>t;
+}
 function updateContext(){
+  refreshPlacement();
   const x=readDesign(),arch=x[6]>120?'Mesoporous':'Planar';$('#architecture').textContent=arch;
   $$('.context-display').forEach(el=>el.textContent=`Fixed context: Eg ${number(x[4])} eV · absorber ${number(x[5])} nm · transport ${number(x[6])} nm (${arch.toLowerCase()}) · ${x[7]?'back':'front'} side · ${x[8]===1?'intrinsic':'p-type'} silicon.`);
   localise();
