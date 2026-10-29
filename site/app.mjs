@@ -1,6 +1,6 @@
 import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=placement-live-9';
+import {localise,language,setLanguage} from './i18n.mjs?v=placement-engineering-10';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -25,7 +25,9 @@ function refreshPlacement(){
   const ids=['value-0','value-6','value-3'],valid=ids.every(id=>$('#'+id)?.checkValidity());
   const [d,t,c]=ids.map(id=>Number($('#'+id)?.value)),back=$('#side').value==='1';
   $('#live-placement').innerHTML=valid?placementDiagram(d,t,c,back):'<p class="micro">Enter valid diameter, transport thickness and shell coverage to display the geometry.</p>';
-  $('#placement-values').innerHTML=valid?`<span>${back?'Back placement':'Front placement'}</span> · <span>${t>120?'Mesoporous':'Planar'}</span> · d = ${d} nm · t = ${t} nm · <span>Exposed cap height</span>: h = ${Math.max(0,d-t)} nm · c_shell = ${c}`:'';
+  for(const [key,value] of [['d',d],['t',t],['c',c*100],['side',back?'1':'0']]){const el=$('#placement-'+key);if(document.activeElement!==el)el.value=Number.isFinite(Number(value))?value:'';}
+  $('#placement-values').innerHTML=valid?`<span>${back?'Back placement':'Front placement'}</span> · <span>${t>120?'Mesoporous':'Planar'}</span> · d = ${d} nm · t = ${t} nm · <span>Exposed cap height</span>: h = ${Math.max(0,d-t)} nm · c_shell = ${Number((c*100).toFixed(6))}%`:'';
+  requestAnimationFrame(()=>{const el=$('#live-placement');if(el.clientWidth>0)el.scrollLeft=Math.max(0,(el.scrollWidth-el.clientWidth)/2);});
   $('#placement-back').hidden=!valid||!back;
   $('#placement-buried').hidden=!valid||d>t;
 }
@@ -123,6 +125,10 @@ function populateMethods(){
   if(metadata.training)$('#training-metrics').innerHTML=`<table><thead><tr><th>Member</th><th>J R²</th><th>V R²</th><th>FF R²</th><th>Mean absolute errors J, V, FF (percentage points)</th></tr></thead><tbody>${metadata.training.metrics.map((m,i)=>`<tr><td>${i+1}</td>${m.r2.map(v=>`<td>${v===null?'Undefined (constant target)':v.toFixed(5)}</td>`).join('')}<td>${m.mae.map(v=>(100*v).toFixed(3)).join(', ')}</td></tr>`).join('')}</tbody></table>`;
   localise();
 }
+for(const [key,source,scale] of [['d','value-0',1],['t','value-6',1],['c','value-3',.01],['side','side',1]]){
+ $('#placement-'+key).addEventListener(key==='side'?'change':'input',e=>{const target=$('#'+source);target.value=e.target.value===''?'':Number(e.target.value)*scale;target.dispatchEvent(new Event(key==='side'?'change':'input',{bubbles:true}));});
+}
+$('#placement-zoom').addEventListener('click',()=>{const enlarged=$('#live-placement').classList.toggle('enlarged');$('#live-placement').scrollLeft=Math.max(0,($('#live-placement').scrollWidth-$('#live-placement').clientWidth)/2);$('#placement-zoom').setAttribute('aria-pressed',String(enlarged));$('#placement-zoom').textContent=enlarged?'Standard view':'Enlarge diagram';localise();});
 controls();route();window.addEventListener('hashchange',route);
 $('#language').value=language();$('#language').addEventListener('change',()=>{setLanguage($('#language').value);route();});
 function themeState(){const dark=document.documentElement.dataset.theme==='dark';$('#theme-toggle').setAttribute('aria-pressed',String(dark));$('#theme-toggle span').textContent=dark?'Light mode':'Dark mode';localise();}
