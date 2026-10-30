@@ -5,9 +5,9 @@
   <meta name="description" content="SiMie: Mie-resonant silicon nanoparticle design for perovskite solar cells. Direct equations, calibrated responses and tandem inverse design.">
   <meta name="theme-color" content="#143e48"><title>SiMie · Silicon nanoparticle design</title>
   <script src="./appearance.js"></script>
-  <link rel="icon" href="./branding/simie-logo-3.png" type="image/png"><link rel="apple-touch-icon" href="./branding/simie-logo-3.png"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./theme.css?v=brand-14">
-  <link rel="stylesheet" href="./visual.css?v=visual-15">
-  <script type="module" src="./app.mjs?v=brand-14"></script>
+  <link rel="icon" href="./branding/simie-logo-3.png" type="image/png"><link rel="apple-touch-icon" href="./branding/simie-logo-3.png"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./theme.css?v=dashboard-16">
+  <link rel="stylesheet" href="./visual.css?v=dashboard-16">
+  <script type="module" src="./app.mjs?v=dashboard-16"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to workspace</a>
@@ -30,14 +30,14 @@
 </aside>
 <main id="main">
   <section class="paper-credit" aria-label="Paper and authors">
-    <div><h2>Machine-Learned Selection of the Size and Placement of Mie-Resonant Silicon Nanoparticles in Perovskite Solar Cells</h2><p class="paper-authors">S. Chatterjee · A. Furasova · S. Makarov</p><p>School of Physics and Engineering, ITMO University, St. Petersburg, Russia</p><p>Qingdao Innovation and Development Center, Harbin Engineering University, Qingdao, China</p></div>
+    <div><h2>Machine-Learned Selection of the Size and Placement of Mie-Resonant Silicon Nanoparticles in Perovskite Solar Cells</h2><p class="paper-authors">S. Chatterjee · A. Furasova · S. Makarov</p><details class="affiliation-details"><summary>Affiliations</summary><p>School of Physics and Engineering, ITMO University, St. Petersburg, Russia</p><p>Qingdao Innovation and Development Center, Harbin Engineering University, Qingdao, China</p></details></div>
     <div class="institution-logos"><a class="institution-credit" aria-label="ITMO University" href="https://itmo.ru/" target="_blank" rel="noreferrer"><span class="itmo-logos"><img class="itmo en light" src="./branding/itmo-en-black.png" alt="ITMO" width="124"><img class="itmo en dark" src="./branding/itmo-en-white.png" alt="ITMO" width="124"><img class="itmo ru light" src="./branding/itmo-ru-black.png" alt="ИТМО" width="124"><img class="itmo ru dark" src="./branding/itmo-ru-white.png" alt="ИТМО" width="124"></span></a><a class="institution-credit" href="https://www.hrbeu.edu.cn/" target="_blank" rel="noreferrer" aria-label="Harbin Engineering University"><img class="heu-logo" src="./branding/heu-emblem.png" alt="Harbin Engineering University" width="88" height="88"></a></div>
   </section>
   <div class="provisional"><span class="small-dot"></span><span>Calibration uncertainties are provisional. Shared pixel scatter and sample counts are disclosed in Methods &amp; data.</span><a href="#methods">View data ↗</a></div>
   <div id="global-error" class="message error" role="alert" hidden></div>
   <section id="page-explorer" class="page">
     <div class="page-heading"><div><div class="eyebrow">FORWARD MODEL / MAIN TEXT &amp; SUPPLEMENT</div><h1>Explore the design space.</h1><p>Connect particle geometry to the paper’s optical and device-response equations.</p></div><div class="heading-actions"><button class="button primary" type="submit" form="design-form" id="evaluate" disabled>Estimate <span aria-hidden="true">→</span></button><button class="button secondary" id="export-result" disabled>↓ Export result</button></div></div>
-    <ol class="quick-start"><li><strong>1. Set parameters</strong><p>Start with the reference geometry or a calibration condition, then adjust the inputs.</p></li><li><strong>2. Estimate</strong><p>Live update recalculates automatically. Turn it off to edit several inputs before pressing Estimate.</p></li><li><strong>3. Read the results</strong><p>Read the relative changes and scientific checks together before interpreting a design.</p></li></ol>
+    <details class="workflow-help"><summary>Quick start guide</summary><ol class="quick-start"><li><strong>1. Set parameters</strong><p>Start with the reference geometry or a calibration condition, then adjust the inputs.</p></li><li><strong>2. Estimate</strong><p>Live update recalculates automatically. Turn it off to edit several inputs before pressing Estimate.</p></li><li><strong>3. Read the results</strong><p>Read the relative changes and scientific checks together before interpreting a design.</p></li></ol></details>
     <div class="workspace">
       <details id="design-inputs-panel" open><summary>All design inputs</summary><form id="design-form" class="panel design-panel">
         <div class="panel-heading"><h2>Design parameters</h2><button type="button" id="reset" class="text-button">Reset</button></div>
