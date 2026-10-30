@@ -1,6 +1,7 @@
+import {savePNG,saveCSV} from './exports.mjs';
 import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=placement-workflow-11';
+import {localise,language,setLanguage} from './i18n.mjs?v=workspace-12';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -44,10 +45,16 @@ function updateContext(){
   localise();
 }
 function setDesign(x){definitions.forEach((_,i)=>{$(`#value-${i}`).value=x[i];$(`#slider-${i}`).value=x[i];});$('#side').value=String(x[7]);$('#doping').value=String(x[8]);updateContext();}
+function showView(key){
+ const selectors={response:'.chart-panel',geometry:'.placement-panel',network:'.network-panel',gate:'.diagnostic-panel'};
+ for(const [name,selector] of Object.entries(selectors))$(selector).hidden=name!==key;
+ $$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===key)));
+}
 function route(){
   const page=['explorer','inverse','selection','methods'].includes(location.hash.slice(1))?location.hash.slice(1):'explorer';
   $$('.page').forEach(el=>el.hidden=el.id!==`page-${page}`);
   $$('nav a').forEach(a=>{if(a.dataset.page===page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  if(location.hash==='#particle-placement')showView('geometry');if(location.hash==='#scientific-checks')showView('gate');
   document.title=`SiMie · ${{explorer:'Design explorer',inverse:'Inverse design',selection:'Next experiment',methods:'Methods & data'}[page]}`;
   localise();
 }
@@ -95,12 +102,13 @@ function renderForward(){
   const checks=[{level:'ok',title:'Direct paper-equation evaluation',text:'Mie lookup, spectral weighting, S2 size average and exposed-cap response; no output clipping.'},...r.flags];
   if(r.diagnostics.budget_pass&&r.diagnostics.finite_positive)checks.push({level:'ok',title:'Necessary physical checks passed',text:'For all five members, absolute current, voltage and fill factor are positive and finite, and current is below the diagnostic ceiling. Relative changes may be negative. This does not establish device feasibility.'});
   if(current.surrogate){const diff=Math.max(...r.mean.map((v,j)=>Math.abs(v-current.surrogate.mean[j])))*100;checks.push({level:diff>1?'warn':'ok',title:'Surrogate cross-check',text:`Largest difference between surrogate and direct-equation ensemble means: ${diff.toFixed(3)} percentage points. The cards above use the direct calculation.`});}
-  $('#diagnostics').innerHTML=checks.map(c=>`<div class="check-row ${c.level}"><span class="check-dot"></span><div><h3>${escape(c.title)}</h3><p>${escape(c.text)}</p></div></div>`).join('');
+  $('#diagnostics').innerHTML=checks.map(c=>`<div class="check-row ${c.level}"><span class="gate-symbol" aria-label="${c.level==='ok'?'Pass':c.level==='error'?'Fail':'Review required'}">${c.level==='ok'?'✓':c.level==='error'?'✕':'!'}</span><div><h3>${escape(c.title)}</h3><p>${escape(c.text)}</p></div></div>`).join('');
   const failed=!r.diagnostics.budget_pass||!r.diagnostics.finite_positive;
   const review=checks.some(c=>c.level==='warn');
+  $('[data-view="gate"]').innerHTML=`<span>Physics gate</span> <span aria-label="${failed?'Fail':review?'Review required':'Pass'}">${failed?'✕':review?'!':'✓'}</span>`;
   $('#result-guidance').textContent=failed?'Failed physical checks. These results are diagnostic only; this design is not recommended for an experiment.':'Review the scientific checks below. Passing necessary checks does not establish experimental feasibility.';
   $('#result-guidance').className=failed?'message error':'micro';
-  $('#check-badge').textContent=failed?'Unvalidated · failed check':review?'Limits to review':'Necessary checks passed';
+  $('#check-badge').textContent=failed?'✕ Failed physical checks':review?'! Limits to review':'✓ Necessary checks passed';
   $('#check-badge').className=`badge ${failed?'error':review?'warn':''}`;
   const q=[['Optical descriptor S̄',`${r.basis.S.toExponential(6)} nm⁻¹`],['Normalised gain G/Gref',number(r.basis.g)],['Normalised cap penalty Π/Πref',number(r.basis.pi)],['S2 distribution integral',r.basis.grid_mass.toFixed(6)],['Diagnostic baseline current',`${number(r.diagnostics.reference_current)} mA/cm²`],['Unity-collection ceiling',`${number(r.diagnostics.ideal_current)} mA/cm²`]];
   $('#quantities').innerHTML=`<dl class="quantity-grid">${q.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
@@ -134,6 +142,18 @@ function populateMethods(){
 for(const [key,source,scale] of [['d','value-0',1],['t','value-6',1],['c','value-3',.01],['side','side',1]]){
  $('#placement-'+key).addEventListener(key==='side'?'change':'input',e=>{const target=$('#'+source);target.value=e.target.value===''?'':Number(e.target.value)*scale;target.dispatchEvent(new Event(key==='side'?'change':'input',{bubbles:true}));});
 }
+$$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+for(const [target,view] of [['particle-placement','geometry'],['scientific-checks','gate']])$$(`a[href="#${target}"]`).forEach(a=>a.addEventListener('click',()=>showView(view)));
+for(const [key,selector,svg] of [['response','.chart-panel','#chart svg'],['geometry','.placement-panel','#live-placement svg'],['network','.network-panel','#network-diagram svg']]){
+ const bar=document.createElement('div');bar.className='graph-exports';
+ for(const kind of ['PNG','CSV']){const b=document.createElement('button');b.type='button';b.className='button secondary';b.textContent=kind;b.setAttribute('aria-label',`${key} ${kind}`);b.addEventListener('click',async()=>{try{
+ if(kind==='PNG'){await savePNG($(svg),`simie-${key}.png`);return;}
+ if(key==='response'){if(!current)throw Error('Estimate the design before exporting.');saveCSV([['diameter_nm','score_mean_percent','score_sd_percent','current_mean_percent','current_sd_percent','descriptor_nm^-1',...['selected_diameter_nm','dispersion','spacing_nm','shell_fraction','bandgap_eV','absorber_nm','transport_nm','side_0_front_1_back','doping_factor']],...current.curve.map(r=>[r.diameter,r.score*100,r.spread*100,r.mean[0]*100,r.std[0]*100,r.S,...current.evaluation.design])],'simie-response.csv');}
+ if(key==='geometry'){if(!$('#live-placement svg'))throw Error('Complete all design fields.');const x=readDesign();saveCSV([['parameter','value','unit'],['diameter',x[0],'nm'],['transport_thickness',x[6],'nm'],['shell_coverage',x[3]*100,'%'],['placement',x[7]?'back':'front',''],['exposed_cap_height',Math.max(0,x[0]-x[6]),'nm'],['back_side_calibration','none; side does not change calculated response',''],['drawing_scale','absorber and other layers schematic','']],'simie-geometry.csv');}
+ if(key==='network'){if(!current?.trace)throw Error('Estimate the design before exporting.');const t=current.trace;saveCSV([['record','member','layer','index','target_index','value'],...current.evaluation.design.map((v,i)=>['physical_input',t.member,'',i,'',v]),...t.activations.flatMap((layer,k)=>layer.map((v,i)=>['activation',t.member,k,i,'',v])),...t.edges.flatMap((layer,k)=>layer.map(e=>['displayed_weight',t.member,k,e.i,e.j,e.weight])),...t.output.map((v,i)=>['relative_output',t.member,'',i,'',v])],'simie-network.csv');}
+ }catch(e){notify(e.message);}});bar.append(b);}$(selector).querySelector('.panel-heading').after(bar);
+}
+showView(location.hash==='#particle-placement'?'geometry':location.hash==='#scientific-checks'?'gate':'response');
 function placementView(fit){const el=$('#live-placement');el.classList.toggle('fit-view',fit);el.classList.remove('enlarged');$('#placement-fit').setAttribute('aria-pressed',String(fit));$('#placement-detail').setAttribute('aria-pressed',String(!fit));$('#placement-zoom').setAttribute('aria-pressed','false');$('#placement-zoom').textContent='Enlarge diagram';el.scrollLeft=Math.max(0,(el.scrollWidth-el.clientWidth)/2);localise();}
 $('#placement-fit').addEventListener('click',()=>placementView(true));
 $('#placement-detail').addEventListener('click',()=>placementView(false));
@@ -144,6 +164,8 @@ $('#placement-export').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='simie-particle-geometry.svg';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
 $('#placement-zoom').addEventListener('click',()=>{$('#live-placement').classList.remove('fit-view');const enlarged=$('#live-placement').classList.toggle('enlarged');$('#placement-fit').setAttribute('aria-pressed','false');$('#placement-detail').setAttribute('aria-pressed',String(!enlarged));$('#live-placement').scrollLeft=Math.max(0,($('#live-placement').scrollWidth-$('#live-placement').clientWidth)/2);$('#placement-zoom').setAttribute('aria-pressed',String(enlarged));$('#placement-zoom').textContent=enlarged?'Standard view':'Enlarge diagram';localise();});
+$('#design-inputs-panel').open=!matchMedia('(max-width:640px)').matches;
+$('#design-form').addEventListener('invalid',()=>$('#design-inputs-panel').open=true,true);
 controls();route();window.addEventListener('hashchange',route);
 $('#language').value=language();$('#language').addEventListener('change',()=>{setLanguage($('#language').value);route();});
 function themeState(){const dark=document.documentElement.dataset.theme==='dark';$('#theme-toggle').setAttribute('aria-pressed',String(dark));$('#theme-toggle span').textContent=dark?'Light mode':'Dark mode';localise();}
