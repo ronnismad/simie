@@ -31,3 +31,7 @@ th,html[data-theme=dark] th{background:var(--pale);color:var(--ink)}.equation,ht
 .check-row>.gate-symbol{box-sizing:border-box;width:32px;min-width:32px;height:32px;line-height:1;margin:0}
 .check-row>div{min-width:0}.check-row h3,.check-row p{overflow-wrap:anywhere}
 .diagnostic-panel .panel-heading{flex-wrap:wrap;align-items:flex-start}.diagnostic-panel .badge{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+/* Keep all sidebar copy on its dark surface, including short desktop windows. */
+@media(min-width:901px){.sidebar{overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable}.sidebar>*{flex-shrink:0}}
+/* Let design descriptions and remaining controls flow with the page, not clip inside a short form. */
+.design-panel{position:static;max-height:none;overflow:visible}
