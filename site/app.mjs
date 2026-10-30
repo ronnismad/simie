@@ -1,7 +1,7 @@
 import {savePNG,saveCSV} from './exports.mjs';
 import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=workspace-12';
+import {localise,language,setLanguage} from './i18n.mjs?v=brand-13';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -72,7 +72,7 @@ function controls(){
   updateContext();
 }
 function setEstimateDisabled(value){$('#evaluate').disabled=value;$('#estimate-bottom').disabled=value;$('#placement-estimate').disabled=value;}
-function schedule(){clearTimeout(timer);++latestEvaluation;setEstimateDisabled(!ready);$('#export-result').disabled=true;$('#stale-notice').hidden=false;placementStatus();if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
+function schedule(){clearTimeout(timer);++latestEvaluation;setEstimateDisabled(!ready);$('#export-result').disabled=true;$('#stale-notice').hidden=false;$('[data-view="gate"]').innerHTML='<span>Physics gate</span> <span aria-label="Pending">…</span>';$('#check-badge').textContent='Inputs changed · estimate required';$('#check-badge').className='badge warn';placementStatus();if(!$('#live-update').checked){$('#forward-results').setAttribute('aria-busy','false');$('#estimate-mode-label').textContent='Press Estimate to update';localise();return;}$('#forward-results').setAttribute('aria-busy','true');localise();timer=setTimeout(()=>{if($('#design-form').checkValidity())evaluate();else $('#forward-results').setAttribute('aria-busy','false');},350);}
 function draw(){
   if(!current)return;
   const mode=$('#chart-mode').value,rows=current.curve,xDesign=current.evaluation.design[0];
