@@ -1,7 +1,8 @@
-import {savePNG,saveCSV} from './exports.mjs?v=inverse-17';
-import {placementDiagram} from './placement.mjs?v=inverse-17';
+import {renderHelp,initHelp} from './help.mjs?v=help-18';
+import {savePNG,saveCSV} from './exports.mjs?v=help-18';
+import {placementDiagram} from './placement.mjs?v=help-18';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=inverse-17';
+import {localise,language,setLanguage} from './i18n.mjs?v=help-18';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -51,11 +52,11 @@ function showView(key){
  $$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===key)));
 }
 function route(){
-  const page=['explorer','inverse','selection','methods'].includes(location.hash.slice(1))?location.hash.slice(1):'explorer';
+  const page=['explorer','inverse','selection','methods','help'].includes(location.hash.slice(1))?location.hash.slice(1):'explorer';
   $$('.page').forEach(el=>el.hidden=el.id!==`page-${page}`);
   $$('nav a').forEach(a=>{if(a.dataset.page===page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(location.hash==='#particle-placement')showView('geometry');if(location.hash==='#scientific-checks')showView('gate');
-  document.title=`SiMie · ${{explorer:'Design explorer',inverse:'Inverse design',selection:'Next experiment',methods:'Methods & data'}[page]}`;
+  document.title=`SiMie · ${{explorer:'Design explorer',inverse:'Inverse design',selection:'Next experiment',methods:'Methods & data',help:'Help'}[page]}`;
   localise();
 }
 function controls(){
@@ -173,8 +174,8 @@ $('#placement-export').addEventListener('click',()=>{
 $('#placement-zoom').addEventListener('click',()=>{$('#live-placement').classList.remove('fit-view');const enlarged=$('#live-placement').classList.toggle('enlarged');$('#placement-fit').setAttribute('aria-pressed','false');$('#placement-detail').setAttribute('aria-pressed',String(!enlarged));$('#live-placement').scrollLeft=Math.max(0,($('#live-placement').scrollWidth-$('#live-placement').clientWidth)/2);$('#placement-zoom').setAttribute('aria-pressed',String(enlarged));$('#placement-zoom').textContent=enlarged?'Standard view':'Enlarge diagram';localise();});
 $('#design-inputs-panel').open=!matchMedia('(max-width:640px)').matches;
 $('#design-form').addEventListener('invalid',()=>$('#design-inputs-panel').open=true,true);
-controls();route();window.addEventListener('hashchange',route);
-$('#language').value=language();$('#language').addEventListener('change',()=>{setLanguage($('#language').value);route();});
+renderHelp(language());initHelp();controls();route();window.addEventListener('hashchange',route);
+$('#language').value=language();$('#language').addEventListener('change',()=>{setLanguage($('#language').value);renderHelp(language());route();});
 function themeState(){const dark=document.documentElement.dataset.theme==='dark';$('#theme-toggle').setAttribute('aria-pressed',String(dark));$('#theme-toggle span').textContent=dark?'Light mode':'Dark mode';localise();}
 themeState();$('#theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('simie-theme',document.documentElement.dataset.theme);}catch{}themeState();});
 $('#live-update').addEventListener('change',()=>{clearTimeout(timer);$('#estimate-mode-label').textContent=$('#live-update').checked?'Inputs update the estimate':'Estimate on click';localise();if($('#live-update').checked)evaluate();});
