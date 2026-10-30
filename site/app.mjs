@@ -1,7 +1,7 @@
-import {savePNG,saveCSV} from './exports.mjs';
+import {savePNG,saveCSV} from './exports.mjs?v=brand-14';
 import {placementDiagram} from './placement.mjs';
 import {networkDiagram} from './diagram.mjs';
-import {localise,language,setLanguage} from './i18n.mjs?v=brand-13';
+import {localise,language,setLanguage} from './i18n.mjs?v=brand-14';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pct=v=>`${v>0?'+':''}${Math.abs(100*v)>=1e4?(100*v).toExponential(2):(100*v).toFixed(2)}%`;
 const number=v=>Math.abs(v)>=1e6||(Math.abs(v)<1e-4&&v!==0)?Number(v).toExponential(3):Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
